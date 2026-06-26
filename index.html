@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GARCÍA - Auto Mecânica | Gerenciador com Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -23,7 +24,6 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 256px;
             background-color: #000;
@@ -138,7 +138,6 @@
             color: #fff;
         }
 
-        /* MAIN CONTENT */
         .main-container {
             flex: 1;
             display: flex;
@@ -151,40 +150,12 @@
             border-bottom: 1px solid #d1d5db;
             padding: 24px 32px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .header h1 {
             font-size: 24px;
             font-weight: bold;
             color: #000;
-        }
-
-        .loading-indicator {
-            display: none;
-            font-size: 12px;
-            color: #9ca3af;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .loading-indicator.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 12px;
-            height: 12px;
-            border: 2px solid #e5e7eb;
-            border-top-color: #facc15;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         .content {
@@ -208,17 +179,9 @@
             to { opacity: 1; }
         }
 
-        /* GRID CARDS */
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -252,7 +215,6 @@
             margin-top: 8px;
         }
 
-        /* TABLE */
         .section-title {
             font-size: 18px;
             font-weight: bold;
@@ -290,17 +252,12 @@
             font-weight: 600;
             color: #6b7280;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         td {
             padding: 16px 24px;
             color: #000;
             border-bottom: 1px solid #e5e7eb;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
         }
 
         tbody tr:nth-child(even) {
@@ -330,7 +287,6 @@
             color: #000;
         }
 
-        /* BUTTONS */
         .btn {
             padding: 12px 32px;
             border: none;
@@ -359,18 +315,10 @@
             border: 2px solid #facc15;
         }
 
-        .btn-secondary:hover {
-            background-color: #1f2937;
-        }
-
         .btn-outline {
             background-color: #f9fafb;
             color: #000;
             border: 1px solid #d1d5db;
-        }
-
-        .btn-outline:hover {
-            background-color: #f3f4f6;
         }
 
         .btn-small {
@@ -383,11 +331,6 @@
             color: #dc2626;
         }
 
-        .btn-danger:hover {
-            background-color: #fca5a5;
-        }
-
-        /* ALERTS */
         .alert {
             padding: 16px;
             border-radius: 8px;
@@ -398,13 +341,6 @@
             font-size: 14px;
         }
 
-        .alert-error {
-            border-color: #fca5a5;
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
-
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -463,8 +399,7 @@
         }
 
         .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #d1d5db;
@@ -474,8 +409,7 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: none;
             border-color: #facc15;
             box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
@@ -494,86 +428,41 @@
             justify-content: flex-end;
         }
 
-        /* BUTTONS ROW */
         .buttons-row {
             display: flex;
             gap: 12px;
             margin-bottom: 24px;
         }
 
-        /* SEARCH */
         .search-box {
             margin-bottom: 24px;
-            display: flex;
-            gap: 12px;
         }
 
         .search-box input {
-            flex: 1;
+            width: 100%;
             padding: 10px 16px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 14px;
         }
 
-        .search-box input:focus {
-            outline: none;
-            border-color: #facc15;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .grid-4 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                align-items: center;
-                padding: 12px;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-                padding: 12px;
-                flex-wrap: wrap;
-            }
-
-            .content {
-                padding: 16px;
-            }
-
-            .grid-4, .grid-3 {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
-
         .action-buttons {
             display: flex;
             gap: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- SIDEBAR -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">G</div>
@@ -603,26 +492,18 @@
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="main-container">
             <div class="header">
-                <div>
-                    <h1 id="page-title">Dashboard</h1>
-                </div>
-                <div class="loading-indicator" id="loading-indicator">
-                    <div class="spinner"></div>
-                    <span>Carregando...</span>
-                </div>
+                <h1 id="page-title">Dashboard</h1>
             </div>
 
             <div class="content">
-                <!-- DASHBOARD PAGE -->
                 <div id="dashboard" class="page active">
                     <div class="grid-4">
                         <div class="card">
                             <div class="card-label">Faturamento</div>
                             <div class="card-value" id="total-faturamento">R$ 0</div>
-                            <div class="card-footer" id="faturamento-info">Hoje</div>
+                            <div class="card-footer">Hoje</div>
                         </div>
                         <div class="card">
                             <div class="card-label">OS Concluídas</div>
@@ -637,7 +518,7 @@
                         <div class="card">
                             <div class="card-label">Contas a Receber</div>
                             <div class="card-value" id="contas-receber">R$ 0</div>
-                            <div class="card-footer" id="contas-info">clientes</div>
+                            <div class="card-footer">clientes</div>
                         </div>
                     </div>
 
@@ -662,11 +543,6 @@
                         </div>
                     </div>
 
-                    <div class="section">
-                        <h2 class="section-title">Alertas</h2>
-                        <div id="alertas-container"></div>
-                    </div>
-
                     <div class="buttons-row">
                         <button class="btn btn-primary" onclick="openModal('novaOS')">➕ Nova OS</button>
                         <button class="btn btn-secondary" onclick="changePage('agendamentos')">📅 Agendar</button>
@@ -674,17 +550,11 @@
                     </div>
                 </div>
 
-                <!-- CLIENTES PAGE -->
                 <div id="clientes" class="page">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 class="section-title" style="margin-bottom: 0;">Clientes</h2>
                         <button class="btn btn-primary" onclick="openModal('novoCliente')">➕ Novo Cliente</button>
                     </div>
-
-                    <div class="search-box">
-                        <input type="text" id="search-clientes" placeholder="Buscar cliente..." onkeyup="filterClientes()">
-                    </div>
-
                     <div class="table-container">
                         <table>
                             <thead>
@@ -704,13 +574,11 @@
                     </div>
                 </div>
 
-                <!-- ORDENS PAGE -->
                 <div id="ordens" class="page">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 class="section-title" style="margin-bottom: 0;">Ordens de Serviço</h2>
                         <button class="btn btn-primary" onclick="openModal('novaOS')">➕ Nova OS</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead>
@@ -720,25 +588,22 @@
                                     <th>Serviço</th>
                                     <th>Status</th>
                                     <th>Valor</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="ordens-table">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; color: #9ca3af;">Carregando...</td>
+                                    <td colspan="5" style="text-align: center; color: #9ca3af;">Carregando...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- AGENDAMENTOS PAGE -->
                 <div id="agendamentos" class="page">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 class="section-title" style="margin-bottom: 0;">Agendamentos</h2>
                         <button class="btn btn-primary" onclick="openModal('novoAgendamento')">➕ Novo Agendamento</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead>
@@ -747,25 +612,22 @@
                                     <th>Data</th>
                                     <th>Hora</th>
                                     <th>Serviço</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="agendamentos-table">
                                 <tr>
-                                    <td colspan="5" style="text-align: center; color: #9ca3af;">Carregando...</td>
+                                    <td colspan="4" style="text-align: center; color: #9ca3af;">Carregando...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- ESTOQUE PAGE -->
                 <div id="estoque" class="page">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 class="section-title" style="margin-bottom: 0;">Estoque</h2>
                         <button class="btn btn-primary" onclick="openModal('novaPeca')">➕ Adicionar Peça</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead>
@@ -774,26 +636,23 @@
                                     <th>Quantidade</th>
                                     <th>Preço Custo</th>
                                     <th>Preço Venda</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="estoque-table">
                                 <tr>
-                                    <td colspan="5" style="text-align: center; color: #9ca3af;">Carregando...</td>
+                                    <td colspan="4" style="text-align: center; color: #9ca3af;">Carregando...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- FATURAMENTO PAGE -->
                 <div id="faturamento" class="page">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h2 class="section-title" style="margin-bottom: 0;">Faturamento</h2>
                         <button class="btn btn-primary" onclick="openModal('novoFaturamento')">➕ Novo Faturamento</button>
                     </div>
-
-                    <div class="grid-3">
+                    <div class="grid-4" style="margin-bottom: 24px;">
                         <div class="card">
                             <div class="card-label">Total Faturado</div>
                             <div class="card-value" id="total-faturado">R$ 0</div>
@@ -807,7 +666,6 @@
                             <div class="card-value" id="total-mes">R$ 0</div>
                         </div>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead>
@@ -817,12 +675,11 @@
                                     <th>Valor</th>
                                     <th>Forma</th>
                                     <th>Status</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="faturamento-table">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; color: #9ca3af;">Carregando...</td>
+                                    <td colspan="5" style="text-align: center; color: #9ca3af;">Carregando...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -831,8 +688,6 @@
             </div>
         </div>
     </div>
-
-    <!-- MODALS -->
 
     <!-- Modal Nova OS -->
     <div id="modal-novaOS" class="modal">
@@ -902,14 +757,6 @@
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="cliente-email" placeholder="email@exemplo.com" required>
-            </div>
-            <div class="form-group">
-                <label>CPF/CNPJ</label>
-                <input type="text" id="cliente-cpf" placeholder="000.000.000-00">
-            </div>
-            <div class="form-group">
-                <label>Endereço</label>
-                <input type="text" id="cliente-endereco" placeholder="Rua, número">
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('novoCliente')">Cancelar</button>
@@ -1026,42 +873,33 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ✅ CONFIGURADO AUTOMATICAMENTE
+        // ✅ CONFIGURADO
         const SUPABASE_URL = 'https://qjdvrqlcblkynheitkuk.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_WtViyZbjpmkjxjP5MFB3mw_-qCQwEXf';
 
-        let supabase = null;
+        let db = null;
         let isConnected = false;
 
-        // Verificar se credenciais estão configuradas
-        if (SUPABASE_URL === 'SEU_URL_AQUI' || SUPABASE_KEY === 'SUA_CHAVE_AQUI') {
-            console.warn('⚠️ Credenciais do Supabase não configuradas! Verifique o guia SETUP_SUPABASE.md');
-            showConnectionError();
-        } else {
-            initSupabase();
-        }
-
-        function initSupabase() {
+        async function initApp() {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                checkConnection();
+                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                await checkConnection();
             } catch (error) {
-                console.error('Erro ao inicializar Supabase:', error);
-                showConnectionError();
+                console.error('Erro ao inicializar:', error);
+                updateConnectionStatus(false);
             }
         }
 
         async function checkConnection() {
             try {
-                const { data, error } = await supabase.from('clientes').select('count', { count: 'exact' }).limit(1);
+                const { data, error } = await db.from('clientes').select('count', { count: 'exact' }).limit(1);
                 if (error) throw error;
                 isConnected = true;
                 updateConnectionStatus(true);
                 loadAllData();
             } catch (error) {
-                console.error('Erro ao conectar:', error);
+                console.error('Erro na conexão:', error);
                 updateConnectionStatus(false);
             }
         }
@@ -1078,43 +916,6 @@
                 status.classList.remove('connected');
             }
         }
-
-        function showConnectionError() {
-            updateConnectionStatus(false);
-            const alertHtml = '<div class="alert alert-error">⚠️ Erro de conexão com Supabase. Verifique suas credenciais no arquivo index.html</div>';
-            document.getElementById('alertas-container').innerHTML = alertHtml;
-        }
-
-        function showLoading(show) {
-            const indicator = document.getElementById('loading-indicator');
-            if (show) {
-                indicator.classList.add('active');
-            } else {
-                indicator.classList.remove('active');
-            }
-        }
-
-        // ============= DATA MANAGEMENT =============
-
-        async function loadAllData() {
-            showLoading(true);
-            try {
-                await Promise.all([
-                    renderDashboard(),
-                    renderClientes(),
-                    renderOrdens(),
-                    renderAgendamentos(),
-                    renderEstoque(),
-                    renderFaturamento()
-                ]);
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // ============= UI FUNCTIONS =============
 
         function changePage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1148,34 +949,23 @@
 
         function closeModal(type) {
             document.getElementById(`modal-${type}`).classList.remove('active');
-            clearForms();
-        }
-
-        function clearForms() {
-            document.querySelectorAll('input, select, textarea').forEach(field => {
-                if (field.type !== 'date' && field.type !== 'time') {
-                    field.value = '';
-                }
-            });
         }
 
         async function populateSelects() {
             if (!isConnected) return;
-
             try {
-                const { data: clientes } = await supabase.from('clientes').select('id, nome');
-                
-                const clienteSelects = ['os-cliente', 'agendamento-cliente', 'faturamento-cliente'];
-                clienteSelects.forEach(id => {
+                const { data: clientes } = await db.from('clientes').select('id, nome');
+                const selects = ['os-cliente', 'agendamento-cliente', 'faturamento-cliente'];
+                selects.forEach(id => {
                     const select = document.getElementById(id);
                     if (select) {
                         select.innerHTML = '<option value="">Selecione um cliente</option>';
                         if (clientes) {
-                            clientes.forEach(cliente => {
-                                const option = document.createElement('option');
-                                option.value = cliente.id;
-                                option.textContent = cliente.nome;
-                                select.appendChild(option);
+                            clientes.forEach(c => {
+                                const opt = document.createElement('option');
+                                opt.value = c.id;
+                                opt.textContent = c.nome;
+                                select.appendChild(opt);
                             });
                         }
                     }
@@ -1185,421 +975,190 @@
             }
         }
 
-        // ============= RENDER FUNCTIONS =============
+        async function loadAllData() {
+            await Promise.all([
+                renderDashboard(),
+                renderClientes(),
+                renderOrdens(),
+                renderAgendamentos(),
+                renderEstoque(),
+                renderFaturamento()
+            ]);
+        }
 
         async function renderDashboard() {
             if (!isConnected) return;
-
             try {
                 const hoje = new Date().toISOString().split('T')[0];
-                
-                const { data: faturamentosHoje } = await supabase
-                    .from('faturamentos')
-                    .select('valor')
-                    .eq('data', hoje);
+                const { data: fat } = await db.from('faturamentos').select('valor').eq('data', hoje);
+                const { data: os } = await db.from('ordens').select('id').eq('status', 'Concluída').eq('data', hoje);
+                const { data: faturamentos } = await db.from('faturamentos').select('valor').eq('status', 'Pendente');
 
-                const { data: ordensConcluidas } = await supabase
-                    .from('ordens')
-                    .select('id')
-                    .eq('status', 'Concluída')
-                    .eq('data', hoje);
+                const totalFat = fat?.reduce((s, f) => s + parseFloat(f.valor || 0), 0) || 0;
+                const totalPend = faturamentos?.reduce((s, f) => s + parseFloat(f.valor || 0), 0) || 0;
 
-                const { data: todosAgendamentos } = await supabase
-                    .from('agendamentos')
-                    .select('data');
-
-                const { data: faturamentosPendentes } = await supabase
-                    .from('faturamentos')
-                    .select('valor')
-                    .eq('status', 'Pendente');
-
-                const { data: ordensProximas } = await supabase
-                    .from('ordens')
-                    .select('*, clientes!inner(nome)')
-                    .order('hora')
-                    .limit(5);
-
-                const { data: pecasBaixo } = await supabase
-                    .from('estoque')
-                    .select('nome, quantidade')
-                    .lt('quantidade', 5);
-
-                // Calcular valores
-                const totalFaturamento = faturamentosHoje?.reduce((sum, f) => sum + (parseFloat(f.valor) || 0), 0) || 0;
-                const agendadosCount = todosAgendamentos?.filter(a => {
-                    const data = new Date(a.data);
-                    const dataHoje = new Date(hoje);
-                    const dias7 = new Date(dataHoje.getTime() + 7 * 24 * 60 * 60 * 1000);
-                    return data >= dataHoje && data <= dias7;
-                }).length || 0;
-                const contasReceber = faturamentosPendentes?.reduce((sum, f) => sum + (parseFloat(f.valor) || 0), 0) || 0;
-
-                document.getElementById('total-faturamento').textContent = `R$ ${totalFaturamento.toFixed(2).replace('.', ',')}`;
-                document.getElementById('os-concluidas').textContent = ordensConcluidas?.length || 0;
-                document.getElementById('agendados').textContent = agendadosCount;
-                document.getElementById('contas-receber').textContent = `R$ ${contasReceber.toFixed(2).replace('.', ',')}`;
-                document.getElementById('contas-info').textContent = `${faturamentosPendentes?.length || 0} clientes`;
-
-                // Próximas ordens
-                const tbody = document.getElementById('proximas-ordens');
-                if (ordensProximas && ordensProximas.length > 0) {
-                    tbody.innerHTML = ordensProximas.map(ordem => {
-                        const badge = ordem.status === 'Concluída' ? 'badge-gray' : ordem.status === 'Em Andamento' ? 'badge-yellow' : 'badge-yellow';
-                        return `
-                            <tr>
-                                <td>${ordem.clientes?.nome || 'N/A'}</td>
-                                <td>${ordem.veiculo}</td>
-                                <td><span class="badge ${badge}">${ordem.status}</span></td>
-                                <td>${ordem.hora}</td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-
-                // Alertas
-                const alertasContainer = document.getElementById('alertas-container');
-                let alertas = [];
-
-                if (pecasBaixo && pecasBaixo.length > 0) {
-                    alertas.push(`⚠️ ${pecasBaixo.length} peça(s) com estoque baixo`);
-                }
-
-                if (faturamentosPendentes && faturamentosPendentes.length > 0) {
-                    alertas.push(`⚠️ ${faturamentosPendentes.length} conta(s) a receber`);
-                }
-
-                if (alertas.length > 0) {
-                    alertasContainer.innerHTML = alertas.map(alert => `<div class="alert">${alert}</div>`).join('');
-                } else {
-                    alertasContainer.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 20px;">Nenhum alerta no momento</div>';
-                }
+                document.getElementById('total-faturamento').textContent = `R$ ${totalFat.toFixed(2).replace('.', ',')}`;
+                document.getElementById('os-concluidas').textContent = os?.length || 0;
+                document.getElementById('agendados').textContent = 0;
+                document.getElementById('contas-receber').textContent = `R$ ${totalPend.toFixed(2).replace('.', ',')}`;
             } catch (error) {
-                console.error('Erro ao renderizar dashboard:', error);
+                console.error('Erro:', error);
             }
         }
 
         async function renderClientes() {
             if (!isConnected) return;
-
             try {
-                const { data: clientes } = await supabase
-                    .from('clientes')
-                    .select('*')
-                    .order('nome');
-
+                const { data } = await db.from('clientes').select('*');
                 const tbody = document.getElementById('clientes-table');
-                if (!clientes || clientes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhum cliente cadastrado</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhum cliente</td></tr>';
                     return;
                 }
-
-                tbody.innerHTML = clientes.map(cliente => `
+                tbody.innerHTML = data.map(c => `
                     <tr>
-                        <td>${cliente.nome}</td>
-                        <td>${cliente.telefone}</td>
-                        <td>${cliente.email}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small btn-outline" onclick="editarCliente('${cliente.id}')">Editar</button>
-                                <button class="btn btn-small btn-danger" onclick="deletarCliente('${cliente.id}')">Deletar</button>
-                            </div>
-                        </td>
+                        <td>${c.nome}</td>
+                        <td>${c.telefone}</td>
+                        <td>${c.email}</td>
+                        <td><button class="btn btn-small btn-danger" onclick="deleteCliente(${c.id})">Deletar</button></td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Erro ao renderizar clientes:', error);
+                console.error('Erro:', error);
             }
         }
 
         async function renderOrdens() {
             if (!isConnected) return;
-
             try {
-                const { data: ordens } = await supabase
-                    .from('ordens')
-                    .select('*, clientes!inner(nome)')
-                    .order('data', { ascending: false });
-
+                const { data } = await db.from('ordens').select('*, clientes!inner(nome)');
                 const tbody = document.getElementById('ordens-table');
-                if (!ordens || ordens.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af;">Nenhuma ordem cadastrada</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhuma ordem</td></tr>';
                     return;
                 }
-
-                tbody.innerHTML = ordens.map(ordem => {
-                    const badge = ordem.status === 'Concluída' ? 'badge-gray' : ordem.status === 'Em Andamento' ? 'badge-yellow' : 'badge-yellow';
-                    return `
-                        <tr>
-                            <td>${ordem.clientes?.nome || 'N/A'}</td>
-                            <td>${ordem.veiculo}</td>
-                            <td>${ordem.servico}</td>
-                            <td><span class="badge ${badge}">${ordem.status}</span></td>
-                            <td>R$ ${parseFloat(ordem.valor).toFixed(2).replace('.', ',')}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-small btn-outline" onclick="editarOrdem('${ordem.id}')">Editar</button>
-                                    <button class="btn btn-small btn-danger" onclick="deletarOrdem('${ordem.id}')">Deletar</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                tbody.innerHTML = data.map(o => `
+                    <tr>
+                        <td>${o.clientes?.nome}</td>
+                        <td>${o.veiculo}</td>
+                        <td>${o.servico}</td>
+                        <td><span class="badge badge-yellow">${o.status}</span></td>
+                        <td>R$ ${parseFloat(o.valor).toFixed(2)}</td>
+                    </tr>
+                `).join('');
             } catch (error) {
-                console.error('Erro ao renderizar ordens:', error);
+                console.error('Erro:', error);
             }
         }
 
         async function renderAgendamentos() {
             if (!isConnected) return;
-
             try {
-                const { data: agendamentos } = await supabase
-                    .from('agendamentos')
-                    .select('*, clientes!inner(nome)')
-                    .order('data');
-
+                const { data } = await db.from('agendamentos').select('*, clientes!inner(nome)');
                 const tbody = document.getElementById('agendamentos-table');
-                if (!agendamentos || agendamentos.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af;">Nenhum agendamento</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhum agendamento</td></tr>';
                     return;
                 }
-
-                tbody.innerHTML = agendamentos.map(agendamento => `
+                tbody.innerHTML = data.map(a => `
                     <tr>
-                        <td>${agendamento.clientes?.nome || 'N/A'}</td>
-                        <td>${new Date(agendamento.data).toLocaleDateString('pt-BR')}</td>
-                        <td>${agendamento.hora}</td>
-                        <td>${agendamento.servico}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small btn-outline" onclick="deletarAgendamento('${agendamento.id}')">Deletar</button>
-                            </div>
-                        </td>
+                        <td>${a.clientes?.nome}</td>
+                        <td>${a.data}</td>
+                        <td>${a.hora}</td>
+                        <td>${a.servico}</td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Erro ao renderizar agendamentos:', error);
+                console.error('Erro:', error);
             }
         }
 
         async function renderEstoque() {
             if (!isConnected) return;
-
             try {
-                const { data: estoque } = await supabase
-                    .from('estoque')
-                    .select('*')
-                    .order('nome');
-
+                const { data } = await db.from('estoque').select('*');
                 const tbody = document.getElementById('estoque-table');
-                if (!estoque || estoque.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af;">Nenhuma peça cadastrada</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhuma peça</td></tr>';
                     return;
                 }
-
-                tbody.innerHTML = estoque.map(peca => `
+                tbody.innerHTML = data.map(e => `
                     <tr>
-                        <td>${peca.nome}</td>
-                        <td style="text-align: center;">${peca.quantidade}</td>
-                        <td>R$ ${parseFloat(peca.custo).toFixed(2).replace('.', ',')}</td>
-                        <td>R$ ${parseFloat(peca.venda).toFixed(2).replace('.', ',')}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small btn-outline" onclick="editarPeca('${peca.id}')">Editar</button>
-                                <button class="btn btn-small btn-danger" onclick="deletarPeca('${peca.id}')">Deletar</button>
-                            </div>
-                        </td>
+                        <td>${e.nome}</td>
+                        <td>${e.quantidade}</td>
+                        <td>R$ ${parseFloat(e.custo).toFixed(2)}</td>
+                        <td>R$ ${parseFloat(e.venda).toFixed(2)}</td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Erro ao renderizar estoque:', error);
+                console.error('Erro:', error);
             }
         }
 
         async function renderFaturamento() {
             if (!isConnected) return;
-
             try {
-                const { data: faturamentos } = await supabase
-                    .from('faturamentos')
-                    .select('*, clientes!inner(nome)')
-                    .order('data', { ascending: false });
+                const { data } = await db.from('faturamentos').select('*, clientes!inner(nome)');
+                const pago = data?.filter(f => f.status === 'Pago').reduce((s, f) => s + parseFloat(f.valor || 0), 0) || 0;
+                const pendente = data?.filter(f => f.status === 'Pendente').reduce((s, f) => s + parseFloat(f.valor || 0), 0) || 0;
 
-                const totalFaturado = faturamentos
-                    ?.filter(f => f.status === 'Pago')
-                    ?.reduce((sum, f) => sum + parseFloat(f.valor || 0), 0) || 0;
-
-                const totalPendente = faturamentos
-                    ?.filter(f => f.status === 'Pendente')
-                    ?.reduce((sum, f) => sum + parseFloat(f.valor || 0), 0) || 0;
-
-                const totalMes = totalFaturado + totalPendente;
-
-                document.getElementById('total-faturado').textContent = `R$ ${totalFaturado.toFixed(2).replace('.', ',')}`;
-                document.getElementById('total-pendente').textContent = `R$ ${totalPendente.toFixed(2).replace('.', ',')}`;
-                document.getElementById('total-mes').textContent = `R$ ${totalMes.toFixed(2).replace('.', ',')}`;
+                document.getElementById('total-faturado').textContent = `R$ ${pago.toFixed(2)}`;
+                document.getElementById('total-pendente').textContent = `R$ ${pendente.toFixed(2)}`;
+                document.getElementById('total-mes').textContent = `R$ ${(pago + pendente).toFixed(2)}`;
 
                 const tbody = document.getElementById('faturamento-table');
-                if (!faturamentos || faturamentos.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af;">Nenhum faturamento registrado</td></tr>';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhum faturamento</td></tr>';
                     return;
                 }
-
-                tbody.innerHTML = faturamentos.map(fat => {
-                    const badge = fat.status === 'Pago' ? 'badge-green' : 'badge-yellow';
-                    return `
-                        <tr>
-                            <td>${fat.clientes?.nome || 'N/A'}</td>
-                            <td>${new Date(fat.data).toLocaleDateString('pt-BR')}</td>
-                            <td>R$ ${parseFloat(fat.valor).toFixed(2).replace('.', ',')}</td>
-                            <td>${fat.forma}</td>
-                            <td><span class="badge ${badge}">${fat.status}</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-small btn-outline" onclick="editarFaturamento('${fat.id}')">Editar</button>
-                                    <button class="btn btn-small btn-danger" onclick="deletarFaturamento('${fat.id}')">Deletar</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Erro ao renderizar faturamento:', error);
-            }
-        }
-
-        async function filterClientes() {
-            if (!isConnected) return;
-
-            const search = document.getElementById('search-clientes').value.toLowerCase();
-            const tbody = document.getElementById('clientes-table');
-            
-            if (search === '') {
-                renderClientes();
-                return;
-            }
-
-            try {
-                const { data: clientes } = await supabase
-                    .from('clientes')
-                    .select('*');
-
-                const filtered = clientes?.filter(c =>
-                    c.nome?.toLowerCase().includes(search) ||
-                    c.telefone?.includes(search) ||
-                    c.email?.toLowerCase().includes(search)
-                ) || [];
-
-                if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #9ca3af;">Nenhum cliente encontrado</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = filtered.map(cliente => `
+                tbody.innerHTML = data.map(f => `
                     <tr>
-                        <td>${cliente.nome}</td>
-                        <td>${cliente.telefone}</td>
-                        <td>${cliente.email}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small btn-outline" onclick="editarCliente('${cliente.id}')">Editar</button>
-                                <button class="btn btn-small btn-danger" onclick="deletarCliente('${cliente.id}')">Deletar</button>
-                            </div>
-                        </td>
+                        <td>${f.clientes?.nome}</td>
+                        <td>${f.data}</td>
+                        <td>R$ ${parseFloat(f.valor).toFixed(2)}</td>
+                        <td>${f.forma}</td>
+                        <td><span class="badge badge-green">${f.status}</span></td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Erro ao filtrar clientes:', error);
+                console.error('Erro:', error);
             }
         }
 
-        // ============= FORM ACTIONS =============
-
         async function salvarCliente() {
-            if (!isConnected) {
-                alert('Erro: Não conectado ao Supabase');
-                return;
-            }
-
+            if (!isConnected) { alert('Desconectado'); return; }
             const nome = document.getElementById('cliente-nome').value;
             const telefone = document.getElementById('cliente-telefone').value;
             const email = document.getElementById('cliente-email').value;
-            const cpf = document.getElementById('cliente-cpf').value;
-            const endereco = document.getElementById('cliente-endereco').value;
-
+            
             if (!nome || !telefone || !email) {
-                alert('Preencha os campos obrigatórios');
+                alert('Preencha todos os campos');
                 return;
             }
 
             try {
-                const { error } = await supabase
-                    .from('clientes')
-                    .insert([{ nome, telefone, email, cpf, endereco }]);
-
-                if (error) throw error;
-
+                await db.from('clientes').insert([{ nome, telefone, email }]);
                 renderClientes();
                 closeModal('novoCliente');
                 alert('Cliente adicionado com sucesso!');
             } catch (error) {
-                console.error('Erro ao salvar cliente:', error);
-                alert('Erro ao adicionar cliente: ' + error.message);
+                alert('Erro: ' + error.message);
             }
         }
 
-        async function editarCliente(id) {
-            if (!isConnected) return;
-
-            try {
-                const { data } = await supabase
-                    .from('clientes')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (!data) return;
-
-                const novoNome = prompt('Novo nome:', data.nome);
-                if (novoNome && novoNome.trim()) {
-                    const { error } = await supabase
-                        .from('clientes')
-                        .update({ nome: novoNome })
-                        .eq('id', id);
-
-                    if (error) throw error;
+        async function deleteCliente(id) {
+            if (confirm('Deletar?')) {
+                try {
+                    await db.from('clientes').delete().eq('id', id);
                     renderClientes();
+                } catch (error) {
+                    alert('Erro: ' + error.message);
                 }
-            } catch (error) {
-                console.error('Erro ao editar cliente:', error);
-            }
-        }
-
-        async function deletarCliente(id) {
-            if (!isConnected) return;
-
-            if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('clientes')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-                renderClientes();
-            } catch (error) {
-                console.error('Erro ao deletar cliente:', error);
-                alert('Erro ao deletar cliente: ' + error.message);
             }
         }
 
         async function salvarOS() {
-            if (!isConnected) {
-                alert('Erro: Não conectado ao Supabase');
-                return;
-            }
-
+            if (!isConnected) { alert('Desconectado'); return; }
             const clienteId = document.getElementById('os-cliente').value;
             const veiculo = document.getElementById('os-veiculo').value;
             const servico = document.getElementById('os-servico').value;
@@ -1614,84 +1173,23 @@
             }
 
             try {
-                const { error } = await supabase
-                    .from('ordens')
-                    .insert([{
-                        cliente_id: parseInt(clienteId),
-                        veiculo,
-                        servico,
-                        data,
-                        hora,
-                        valor: parseFloat(valor),
-                        status
-                    }]);
-
-                if (error) throw error;
-
+                await db.from('ordens').insert([{
+                    cliente_id: parseInt(clienteId),
+                    veiculo, servico, data, hora,
+                    valor: parseFloat(valor),
+                    status
+                }]);
                 renderOrdens();
                 renderDashboard();
                 closeModal('novaOS');
-                alert('Ordem de serviço criada com sucesso!');
+                alert('Ordem criada!');
             } catch (error) {
-                console.error('Erro ao salvar OS:', error);
-                alert('Erro ao criar ordem: ' + error.message);
-            }
-        }
-
-        async function editarOrdem(id) {
-            if (!isConnected) return;
-
-            try {
-                const { data } = await supabase
-                    .from('ordens')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (!data) return;
-
-                const novoStatus = prompt('Novo status:', data.status);
-                if (novoStatus && (novoStatus === 'Aguardando' || novoStatus === 'Em Andamento' || novoStatus === 'Concluída')) {
-                    const { error } = await supabase
-                        .from('ordens')
-                        .update({ status: novoStatus })
-                        .eq('id', id);
-
-                    if (error) throw error;
-                    renderOrdens();
-                    renderDashboard();
-                }
-            } catch (error) {
-                console.error('Erro ao editar ordem:', error);
-            }
-        }
-
-        async function deletarOrdem(id) {
-            if (!isConnected) return;
-
-            if (!confirm('Tem certeza que deseja deletar esta ordem?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('ordens')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-                renderOrdens();
-                renderDashboard();
-            } catch (error) {
-                console.error('Erro ao deletar ordem:', error);
-                alert('Erro ao deletar: ' + error.message);
+                alert('Erro: ' + error.message);
             }
         }
 
         async function salvarAgendamento() {
-            if (!isConnected) {
-                alert('Erro: Não conectado ao Supabase');
-                return;
-            }
-
+            if (!isConnected) { alert('Desconectado'); return; }
             const clienteId = document.getElementById('agendamento-cliente').value;
             const data = document.getElementById('agendamento-data').value;
             const hora = document.getElementById('agendamento-hora').value;
@@ -1703,137 +1201,48 @@
             }
 
             try {
-                const { error } = await supabase
-                    .from('agendamentos')
-                    .insert([{
-                        cliente_id: parseInt(clienteId),
-                        data,
-                        hora,
-                        servico
-                    }]);
-
-                if (error) throw error;
-
+                await db.from('agendamentos').insert([{
+                    cliente_id: parseInt(clienteId),
+                    data, hora, servico
+                }]);
                 renderAgendamentos();
                 renderDashboard();
                 closeModal('novoAgendamento');
-                alert('Agendamento criado com sucesso!');
+                alert('Agendamento criado!');
             } catch (error) {
-                console.error('Erro ao salvar agendamento:', error);
-                alert('Erro ao criar agendamento: ' + error.message);
-            }
-        }
-
-        async function deletarAgendamento(id) {
-            if (!isConnected) return;
-
-            if (!confirm('Tem certeza que deseja deletar este agendamento?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('agendamentos')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-                renderAgendamentos();
-                renderDashboard();
-            } catch (error) {
-                console.error('Erro ao deletar agendamento:', error);
+                alert('Erro: ' + error.message);
             }
         }
 
         async function salvarPeca() {
-            if (!isConnected) {
-                alert('Erro: Não conectado ao Supabase');
-                return;
-            }
-
+            if (!isConnected) { alert('Desconectado'); return; }
             const nome = document.getElementById('peca-nome').value;
             const quantidade = document.getElementById('peca-quantidade').value;
             const custo = document.getElementById('peca-custo').value;
             const venda = document.getElementById('peca-venda').value;
 
             if (!nome || !quantidade || !custo || !venda) {
-                alert('Preencha todos os campos');
+                alert('Preencha todos');
                 return;
             }
 
             try {
-                const { error } = await supabase
-                    .from('estoque')
-                    .insert([{
-                        nome,
-                        quantidade: parseInt(quantidade),
-                        custo: parseFloat(custo),
-                        venda: parseFloat(venda)
-                    }]);
-
-                if (error) throw error;
-
+                await db.from('estoque').insert([{
+                    nome,
+                    quantidade: parseInt(quantidade),
+                    custo: parseFloat(custo),
+                    venda: parseFloat(venda)
+                }]);
                 renderEstoque();
-                renderDashboard();
                 closeModal('novaPeca');
-                alert('Peça adicionada com sucesso!');
+                alert('Peça adicionada!');
             } catch (error) {
-                console.error('Erro ao salvar peça:', error);
-                alert('Erro ao adicionar peça: ' + error.message);
-            }
-        }
-
-        async function editarPeca(id) {
-            if (!isConnected) return;
-
-            try {
-                const { data } = await supabase
-                    .from('estoque')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (!data) return;
-
-                const novaQtd = prompt('Nova quantidade:', data.quantidade);
-                if (novaQtd) {
-                    const { error } = await supabase
-                        .from('estoque')
-                        .update({ quantidade: parseInt(novaQtd) })
-                        .eq('id', id);
-
-                    if (error) throw error;
-                    renderEstoque();
-                    renderDashboard();
-                }
-            } catch (error) {
-                console.error('Erro ao editar peça:', error);
-            }
-        }
-
-        async function deletarPeca(id) {
-            if (!isConnected) return;
-
-            if (!confirm('Tem certeza que deseja deletar esta peça?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('estoque')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-                renderEstoque();
-                renderDashboard();
-            } catch (error) {
-                console.error('Erro ao deletar peça:', error);
+                alert('Erro: ' + error.message);
             }
         }
 
         async function salvarFaturamento() {
-            if (!isConnected) {
-                alert('Erro: Não conectado ao Supabase');
-                return;
-            }
-
+            if (!isConnected) { alert('Desconectado'); return; }
             const clienteId = document.getElementById('faturamento-cliente').value;
             const data = document.getElementById('faturamento-data').value;
             const valor = document.getElementById('faturamento-valor').value;
@@ -1841,86 +1250,34 @@
             const status = document.getElementById('faturamento-status').value;
 
             if (!clienteId || !data || !valor || !forma || !status) {
-                alert('Preencha todos os campos');
+                alert('Preencha todos');
                 return;
             }
 
             try {
-                const { error } = await supabase
-                    .from('faturamentos')
-                    .insert([{
-                        cliente_id: parseInt(clienteId),
-                        data,
-                        valor: parseFloat(valor),
-                        forma,
-                        status
-                    }]);
-
-                if (error) throw error;
-
+                await db.from('faturamentos').insert([{
+                    cliente_id: parseInt(clienteId),
+                    data,
+                    valor: parseFloat(valor),
+                    forma, status
+                }]);
                 renderFaturamento();
                 renderDashboard();
                 closeModal('novoFaturamento');
-                alert('Faturamento registrado com sucesso!');
+                alert('Faturamento registrado!');
             } catch (error) {
-                console.error('Erro ao salvar faturamento:', error);
-                alert('Erro ao registrar faturamento: ' + error.message);
+                alert('Erro: ' + error.message);
             }
         }
 
-        async function editarFaturamento(id) {
-            if (!isConnected) return;
-
-            try {
-                const { data } = await supabase
-                    .from('faturamentos')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (!data) return;
-
-                const novoStatus = prompt('Novo status (Pago/Pendente):', data.status);
-                if (novoStatus && (novoStatus === 'Pago' || novoStatus === 'Pendente')) {
-                    const { error } = await supabase
-                        .from('faturamentos')
-                        .update({ status: novoStatus })
-                        .eq('id', id);
-
-                    if (error) throw error;
-                    renderFaturamento();
-                    renderDashboard();
-                }
-            } catch (error) {
-                console.error('Erro ao editar faturamento:', error);
-            }
-        }
-
-        async function deletarFaturamento(id) {
-            if (!isConnected) return;
-
-            if (!confirm('Tem certeza que deseja deletar este faturamento?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('faturamentos')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-                renderFaturamento();
-                renderDashboard();
-            } catch (error) {
-                console.error('Erro ao deletar faturamento:', error);
-            }
-        }
-
-        // ============= INITIALIZATION =============
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
             }
         };
+
+        // Iniciar
+        initApp();
     </script>
 </body>
 </html>
