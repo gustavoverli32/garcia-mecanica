@@ -1,19 +1,26 @@
-const CACHE='garcia-v1';
-const ASSETS=['./index.html','./manifest.json'];
+const CACHE='garcia-v3';
+const ASSETS=['./manifest.json'];
 self.addEventListener('install',e=>{
+  self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
 });
 self.addEventListener('activate',e=>{
-  e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  e.waitUntil(Promise.all([
+    caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))),
+    self.clients.claim(),
+  ]));
 });
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   if(e.request.url.includes('supabase.co'))return;
+  // navegação (HTML principal): nunca intercepta — sempre busca versão mais nova direto da rede
+  if(e.request.mode==='navigate'||e.request.destination==='document')return;
+  // demais assets: network-first com fallback a cache (uso offline)
   e.respondWith(
-    caches.match(e.request).then(cached=>cached||fetch(e.request).then(res=>{
+    fetch(e.request).then(res=>{
       const copy=res.clone();
       caches.open(CACHE).then(c=>c.put(e.request,copy));
       return res;
-    }).catch(()=>cached))
+    }).catch(()=>caches.match(e.request))
   );
 });
