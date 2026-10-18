@@ -1,20 +1,17 @@
 # Template legado
 
-`template.html` é a fonte extraída do bloco `__bundler/template` presente em
-`index.html`. Ele representa o comportamento atual da Garcia Mecânica e existe
-para permitir a migração gradual para módulos editáveis.
+`source/` contém a aplicação Garcia atual separada por áreas de código. O build
+concatena essas partes na ordem de `scripts/original-parts.mjs` e reinclui a imagem
+de `assets/car-image.base64`. Nenhum wrapper novo é adicionado ao runtime.
 
-Não altere este arquivo diretamente para corrigir funcionalidades. Primeiro
-extraia novamente com:
-
-```powershell
-npm run extract:template
-```
-
-Depois de qualquer alteração no bundle, execute:
+`template.html` é a cópia gerada do bloco `__bundler/template` em `index.html`.
+Edite os arquivos em `source/`, depois execute:
 
 ```powershell
-npm run verify:template
+npm run build
+npm run check:original
 ```
 
-Este arquivo não é um novo deploy e não altera dados do Supabase.
+As partes JavaScript são fragmentos contíguos da classe `Component`; não devem ser
+carregadas individualmente no navegador. A extração inicial só pode ser repetida
+após remover manualmente as fontes, para impedir a perda de mudanças futuras.

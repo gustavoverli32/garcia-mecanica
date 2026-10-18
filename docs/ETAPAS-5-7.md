@@ -1,5 +1,9 @@
 # Etapas 5, 6 e 7
 
+> Histórico do protótipo Next.js. Essas etapas não equivalem à aprovação do
+> visual da Garcia atual. O fluxo ativo usa o bundle original e o preview padrão
+> passou a servir o `index.html` publicado.
+
 ## Etapa 5 — Tokens de design
 
 Tokens da identidade atual foram documentados para permitir futuras alterações controladas, sem aplicar redesign.

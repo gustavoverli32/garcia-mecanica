@@ -1,5 +1,11 @@
 # Como reverter, se algo der errado
 
+> Este documento descreve uma alteração antiga no bundle. Para a branch
+> `codex/preserve-original-ui`, o `index.html` não mudou. Se for necessário
+> abandonar esta refatoração, não faça merge da branch ou reverta o commit
+> dela no GitHub. Não execute os comandos históricos abaixo sem conferir o
+> commit e o estado atual de `main`.
+
 ## Antes de tudo: os dados do cliente não correm risco aqui
 
 Os dados da oficina — ordens de serviço, clientes, faturamentos, despesas, funcionários —

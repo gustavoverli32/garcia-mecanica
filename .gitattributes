@@ -1,0 +1,3 @@
+# Source fragments are concatenated byte for byte into the existing bundle.
+src/legacy/source/** text eol=lf whitespace=-blank-at-eof
+src/legacy/assets/*.base64 -text

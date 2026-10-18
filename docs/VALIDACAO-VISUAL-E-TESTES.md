@@ -1,5 +1,12 @@
 # Validação visual e testes — etapas 3 e 4
 
+> Registro histórico do protótipo Next.js, anterior à correção de escopo. Os
+> resultados abaixo não demonstram equivalência visual com a Garcia publicada.
+> Para a versão atual, o build original passa em `npm run check:original` e
+> `npm run check:published`. A comparação visual interativa do preview local
+> não foi concluída nesta branch; o carregamento pode executar gravações
+> automáticas de salários no Supabase.
+
 ## Escopo
 
 Validação feita no clone oficial do GitHub, sem alteração de identidade visual, layout ou dados do Supabase.

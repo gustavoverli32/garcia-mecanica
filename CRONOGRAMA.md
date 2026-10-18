@@ -1,5 +1,11 @@
 # Cronograma
 
+> Atualização: o protótipo Next.js listado abaixo foi produzido antes da correção
+> de escopo e não reproduz a Garcia atual. O trabalho ativo usa o código original
+> em `src/legacy/source/`, com o mesmo bundle, visual e endereço GitHub Pages.
+> O preview padrão agora serve essa aplicação original. As caixas abaixo registram
+> o histórico do protótipo e não significam aprovação para substituir o site.
+
 ## Semana 1 — Fundação
 
 - [x] Identificar o repositório e preservar o bundle atual.

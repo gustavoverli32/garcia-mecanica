@@ -15,16 +15,16 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Typecheck modular app
-        run: npm run typecheck
-      - name: Contract tests
-        run: npm test
-      - name: Verify environment contract
-        run: npm run verify:env
-      - name: Build modular app
+      - name: Verify original source against published bundle
+        run: npm run check:original
+      - name: Build original app
         run: npm run build
-      - name: Verify read-only data layer
-        run: npm run verify:readonly
+      - name: Verify original source after build
+        run: npm run check:original
+      - name: Protect approved site bundle
+        run: npm run check:published
       - name: Validate exported bundle
         shell: pwsh
         run: ./scripts/validate-bundle.ps1
+      - name: Verify extracted template
+        run: npm run verify:template
