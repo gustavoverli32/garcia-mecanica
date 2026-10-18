@@ -10,6 +10,7 @@
     "verify:template": "node scripts/verify-template.mjs",
     "verify:readonly": "node scripts/assert-readonly.mjs",
     "test": "node --test tests/contracts.test.mjs",
+    "verify:env": "node scripts/verify-env-config.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

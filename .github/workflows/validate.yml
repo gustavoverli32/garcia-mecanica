@@ -19,6 +19,8 @@ jobs:
         run: npm run typecheck
       - name: Contract tests
         run: npm test
+      - name: Verify environment contract
+        run: npm run verify:env
       - name: Build modular app
         run: npm run build
       - name: Verify read-only data layer
