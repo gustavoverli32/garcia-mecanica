@@ -18,6 +18,7 @@
 - [x] Criar tela de login modular usando Supabase Auth, ainda não ativada como guarda global.
 - [x] Adicionar sessão SSR por cookies e proteção das rotas modulares.
 - [x] Adicionar encerramento seguro da sessão modular.
+- [x] Criar adaptador de escritas protegido por Supabase Auth, ainda isolado das telas.
 
 ## Semana 2 — Fonte editável
 
