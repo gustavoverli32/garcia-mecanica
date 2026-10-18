@@ -7,13 +7,15 @@ críticos. A primeira entrega não altera as operações de persistência do Sup
 
 ## D2 — Stack alvo
 
-Será adotado o mesmo formato planejado no EconGNV: Next.js, TypeScript, Supabase,
-Vercel e GitHub Actions.
+Decisão revista: a Garcia original é a base da refatoração. O formato de código
+do EconGNV pode orientar a organização interna, mas a plataforma e o link atuais
+continuam em GitHub Pages. O protótipo Next.js permanece separado e não substitui
+o sistema usado pelo cliente.
 
 ## D3 — Identidade visual
 
-O EconGNV será referência de layout, hierarquia, espaçamento e componentização.
-Cores, textos, logo e linguagem visual permanecem próprios da Garcia Mecânica.
+O visual atual da Garcia é a referência exata. Cores, textos, logo, layout,
+navegação e comportamento devem permanecer iguais.
 
 ## D4 — Fonte da verdade
 

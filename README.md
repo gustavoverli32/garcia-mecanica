@@ -4,7 +4,10 @@ Plataforma de gestão da oficina Garcia Auto Mecânica.
 
 ## Status
 
-Fundação do refatoramento concluída — documentação, validação do bundle e plano de migração publicados.
+O site usado pelo cliente continua sendo o bundle original em `index.html`, publicado em
+`https://gustavoverli32.github.io/garcia-mecanica/`. O código desse mesmo bundle foi
+separado em partes editáveis em `src/legacy/source/`; o build recompõe a aplicação
+sem trocar a interface, as operações ou o projeto Supabase.
 
 ## Estado atual
 
@@ -13,9 +16,9 @@ fica dentro de `index.html`, no bloco `script[type="__bundler/template"]`, e usa
 um runtime de empacotamento no próprio arquivo. O arquivo é publicado diretamente
 por GitHub Pages.
 
-Esse formato funciona em produção, mas dificulta manutenção, testes e evolução do
-código. O refatoramento será feito em etapas, preservando integralmente os dados,
-as integrações existentes com Supabase e a interface visual atual da Garcia.
+O código separado mantém a ordem, o texto e os recursos originais. A imagem grande
+embutida no JavaScript foi colocada em `src/legacy/assets/car-image.base64` para
+deixar os métodos legíveis; o build a reinsere sem alterar o resultado.
 
 ## Contratos de preservação
 
@@ -24,28 +27,40 @@ as integrações existentes com Supabase e a interface visual atual da Garcia.
 - Não substituir o bundle de produção até a nova implementação ser validada.
 - Toda mudança deve ser reversível e passar por validação antes do deploy.
 
-## Plano de modernização
+## Código-fonte e build
 
-1. Documentar escopo e decisões do produto.
-2. Criar fonte editável e rotina reprodutível de build.
-3. Extrair tokens de design e componentes de layout.
-4. Separar autenticação, dados, navegação e apresentação.
-5. Migrar a interface para o padrão visual do EconGNV, mantendo a identidade da Garcia.
+Edite as partes em `src/legacy/source/` mantendo a ordem indicada em
+`scripts/original-parts.mjs`. Os arquivos `.js` são trechos contíguos da classe
+original, concatenados pelo build. `src/legacy/template.html` e `index.html` são
+artefatos gerados. Para recompô-los e validar:
+
+```powershell
+npm run build
+npm run check:original
+npm run check:published
+npm run validate
+```
+
+`scripts/split-original.mjs` serviu somente para a primeira extração e recusa
+sobrescrever as partes editáveis. O controle de versão guarda o bundle anterior.
 
 ## Fluxo de desenvolvimento
 
-1. Criar uma branch `feature/<nome>` a partir de `main`.
+1. Criar uma branch `codex/<nome>` a partir de `main`.
 2. Implementar uma entrega pequena e testável.
 3. Abrir Pull Request com checklist.
 4. Validar preview e fluxo principal.
 5. Fazer merge somente após revisão e validação.
 
-## Stack alvo
+## Plataforma em uso
 
-- Next.js + TypeScript
-- Supabase (PostgreSQL, Auth e Row Level Security)
-- Vercel (preview e produção)
-- GitHub (Issues e Pull Requests)
+- HTML/JavaScript original com o runtime do exportador.
+- Supabase existente, com os mesmos dados e operações.
+- GitHub Pages no mesmo endereço público.
+- Preview local do próprio `index.html`.
+
+O protótipo em `src/app/` usa Next.js, mas não corresponde ao sistema atual e não
+participa do preview padrão nem do build da aplicação usada pelo cliente.
 
 ## Documentação
 
@@ -70,24 +85,15 @@ Com Node.js 20 ou superior, também é possível inspecionar o bundle:
 npm run inspect:bundle
 ```
 
-`npm run extract:template` extrai uma cópia de trabalho do template embutido para
-`src/legacy/template.html`. Essa cópia é uma etapa de migração e não deve ser
-publicada nem editada para alterar o comportamento de produção sem revisão.
-
-## Shell modular
-
-O novo shell Next.js roda em paralelo ao bundle legado:
+`npm run dev` abre a Garcia original em `http://localhost:3000/`:
 
 ```powershell
-npm install
 npm run dev
 ```
 
-Ele ainda não substitui a produção nem executa gravações no Supabase.
-
-Para habilitar apenas a leitura no ambiente local, copie `.env.example` para
-`.env.local` e preencha as credenciais públicas do projeto existente. Nenhuma
-operação de escrita é feita por essa camada.
+O preview executa a aplicação original; ações nela têm os mesmos efeitos no
+Supabase que no endereço público. Para consultar sem alterar dados, navegue pelas
+telas sem salvar, excluir ou concluir registros.
 
 ## Dados
 
