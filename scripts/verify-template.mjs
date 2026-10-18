@@ -9,7 +9,8 @@ const match = bundle.match(/<script type="__bundler\/template">([\s\S]*?)<\/scri
 if (!match) throw new Error('Bloco __bundler/template não encontrado.');
 
 const embedded = JSON.parse(match[1].trim());
-if (embedded !== extracted) {
+const normalize = (value) => value.replace(/\r\n/g, '\n');
+if (normalize(embedded) !== normalize(extracted)) {
   throw new Error('A fonte extraída diverge do template embutido no bundle. Execute npm run extract:template.');
 }
 
