@@ -9,6 +9,7 @@
     "extract:template": "node scripts/extract-template.mjs",
     "verify:template": "node scripts/verify-template.mjs",
     "verify:readonly": "node scripts/assert-readonly.mjs",
+    "test": "node --test tests/contracts.test.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

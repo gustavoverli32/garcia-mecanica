@@ -17,6 +17,8 @@ jobs:
       - run: npm ci
       - name: Typecheck modular app
         run: npm run typecheck
+      - name: Contract tests
+        run: npm test
       - name: Build modular app
         run: npm run build
       - name: Verify read-only data layer
