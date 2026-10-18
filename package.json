@@ -1,0 +1,33 @@
+{
+  "name": "garcia-mecanica",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Base de modernização da plataforma Garcia Auto Mecânica",
+  "scripts": {
+    "validate": "pwsh -NoProfile -File scripts/validate-bundle.ps1",
+    "inspect:bundle": "node scripts/inspect-bundle.mjs",
+    "extract:template": "node scripts/extract-template.mjs",
+    "verify:template": "node scripts/verify-template.mjs",
+    "verify:readonly": "node scripts/assert-readonly.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.57.0",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

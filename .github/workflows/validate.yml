@@ -1,0 +1,26 @@
+name: Validate bundle
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  bundle:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck modular app
+        run: npm run typecheck
+      - name: Build modular app
+        run: npm run build
+      - name: Verify read-only data layer
+        run: npm run verify:readonly
+      - name: Validate exported bundle
+        shell: pwsh
+        run: ./scripts/validate-bundle.ps1
