@@ -1,3 +1,6 @@
+ 'use client';
+
+import { useEffect, useState } from 'react';
 import type { GarciaDataSnapshot } from '../domain/entities';
 import { LogoutButton } from './logout-button';
 
@@ -7,6 +10,7 @@ type Props = {
 };
 
 const number = new Intl.NumberFormat('pt-BR');
+const money = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function labelForConnection(connection: Props['connection']): string {
   if (connection === 'online') return '● Online — leitura ativa';
@@ -15,17 +19,31 @@ function labelForConnection(connection: Props['connection']): string {
 }
 
 export function Dashboard({ snapshot, connection }: Props) {
-  const data = snapshot ?? { clientes: [], ordens: [], faturamentos: [], despesas: [], funcionarios: [] };
+  const [data, setData] = useState(snapshot ?? { clientes: [], ordens: [], faturamentos: [], despesas: [], funcionarios: [] });
+  useEffect(() => {
+    if (!snapshot) return;
+    try {
+      const deleted = new Set(JSON.parse(localStorage.getItem('g_dep_del') ?? '[]').map(String));
+      const cached = JSON.parse(localStorage.getItem('g_dep') ?? 'null');
+      const despesas = Array.isArray(cached) ? cached.filter((item) => !deleted.has(String(item.id))) : snapshot.despesas.filter((item) => !deleted.has(String(item.id)));
+      setData({ ...snapshot, despesas });
+    } catch {
+      setData(snapshot);
+    }
+  }, [snapshot]);
   const abertas = data.ordens.filter((ordem) => ordem.status !== 'Concluída').length;
   const receita = data.faturamentos.reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
   const despesa = data.despesas.reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
+  const mesAtual = new Date().toISOString().slice(0, 7);
+  const receitaMes = data.faturamentos.filter((item) => item.data?.slice(0, 7) === mesAtual).reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
+  const despesaMes = data.despesas.filter((item) => item.data?.slice(0, 7) === mesAtual).reduce((sum, item) => sum + Number(item.valor ?? 0), 0);
   const recentes = [...data.ordens].sort((a, b) => Number(b.id) - Number(a.id)).slice(0, 6);
 
   const cards = [
-    ['Clientes', number.format(data.clientes.length), '#FFC107'],
-    ['OS em aberto', number.format(abertas), '#10B981'],
-    ['Receitas', receita.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), '#818CF8'],
-    ['Despesas', despesa.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), '#EF4444'],
+    ['Receitas', receitaMes, '#10B981'],
+    ['Despesas', despesaMes, '#EF4444'],
+    ['OS em aberto', number.format(abertas), '#FF8C00'],
+    ['Clientes', number.format(data.clientes.length), '#818CF8'],
   ];
 
   return (
@@ -40,8 +58,8 @@ export function Dashboard({ snapshot, connection }: Props) {
           <div><h1>Dashboard</h1><p>Visão geral da oficina</p></div>
           <div className="gm-actions"><span className={`gm-connection gm-${connection}`}>{labelForConnection(connection)}</span><button className="gm-new" type="button">+ Nova OS</button></div>
         </header>
-        <div className="gm-grid">{cards.map(([title, value, color]) => <article className="gm-card" key={title}><span className="gm-card-icon" style={{ color }}>{title === 'Clientes' ? '♟' : title === 'OS em aberto' ? '🔧' : title === 'Receitas' ? '📈' : '📉'}</span><div><small>{title}</small><strong>{value}</strong><em>mês atual</em></div></article>)}</div>
-        <div className="gm-main-grid"><article className="gm-panel gm-chart"><div className="gm-panel-head"><div><h2>Receita Mensal</h2><p>Últimos 6 meses</p></div><strong>{number.format(receita)}</strong></div><div className="gm-bars">{['mai','jun','jul','ago','set','out'].map((month, i) => <div className="gm-bar-wrap" key={month}><i className={`gm-bar gm-bar-${i}`} /><small>{month}</small></div>)}</div></article><article className="gm-panel gm-profit"><h2>Lucro do Mês</h2><strong>{(receita - despesa).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong><p>receitas − despesas</p><h3>FORMA DE PAGAMENTO</h3><p>PIX <span>100%</span></p><hr /><p>Cartão <span>0%</span></p><hr /><p>Dinheiro <span>0%</span></p><hr /></article></div>
+        <div className="gm-grid">{cards.map(([title, value, color]) => { const financial = title === 'Receitas' || title === 'Despesas'; return <article className="gm-card" key={title}><span className="gm-card-icon" style={{ color: String(color) }}>{title === 'Clientes' ? '♟' : title === 'OS em aberto' ? '🔧' : title === 'Receitas' ? '📈' : '📉'}</span><div><small>{title}</small><strong>{financial ? money(Number(value)) : value}</strong><em>{title === 'Clientes' ? 'cadastrados' : title === 'OS em aberto' ? `${data.ordens.filter((order) => order.status === 'Aguardando Peça').length} aguard. peça` : 'mês atual'}</em></div></article>; })}</div>
+        <div className="gm-main-grid"><article className="gm-panel gm-chart"><div className="gm-panel-head"><div><h2>Receita Mensal</h2><p>Últimos 6 meses</p></div><strong>{money(receitaMes)}</strong></div><div className="gm-bars">{['mai','jun','jul','ago','set','out'].map((month, i) => <div className="gm-bar-wrap" key={month}><i className={`gm-bar gm-bar-${i}`} /><small>{month}</small></div>)}</div></article><article className="gm-panel gm-profit"><h2>Lucro do Mês</h2><strong className={receitaMes - despesaMes < 0 ? 'gm-negative' : ''}>{money(receitaMes - despesaMes)}</strong><p>receitas − despesas</p><h3>FORMA DE PAGAMENTO</h3><p>PIX <span>100%</span></p><hr /><p>Cartão <span>0%</span></p><hr /><p>Dinheiro <span>0%</span></p><hr /></article></div>
         <article className="gm-panel gm-orders"><div className="gm-panel-head"><h2>OS Recentes</h2><a href="/os">Ver todas →</a></div>{recentes.map((order) => <div className="gm-order" key={String(order.id)}><b>#{order.id}</b><span>{data.clientes.find((client) => String(client.id) === String(order.cliente_id))?.nome ?? 'Cliente'}</span><span>{String(order.veiculo ?? '—')}</span><span>{String(order.servico ?? order.observacoes ?? 'Serviço mecânico')}</span><strong>{Number(order.valor ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong><em>{order.status ?? 'Aguardando'}</em></div>)}</article>
       </section>
       <style>{styles}</style>
@@ -74,4 +92,5 @@ const styles = `
   .gm-main-grid { display:grid; grid-template-columns:minmax(0,2.2fr) minmax(250px,1fr); gap:14px; margin-top:18px; } .gm-panel-head { display:flex; justify-content:space-between; align-items:start; } .gm-panel-head p,.gm-profit>p { margin:4px 0; color:#9ca3af; font-size:12px; } .gm-panel-head>strong { color:#ffb900; font-size:20px; } .gm-bars { height:200px; display:flex; align-items:end; gap:10px; padding-top:28px; } .gm-bar-wrap { height:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:end; gap:8px; } .gm-bar { width:100%; height:42%; border-radius:6px 6px 3px 3px; background:#e5e7eb; } .gm-bar-1{height:36%}.gm-bar-2{height:53%}.gm-bar-3{height:48%}.gm-bar-4{height:62%}.gm-bar-5{height:78%;background:#ffc107}.gm-bar-wrap small{color:#a0a4b0;font-size:11px}.gm-profit>strong{display:block;color:#10b981;font-size:28px;margin-top:10px}.gm-profit h3{color:#8e94a5;font-size:11px;letter-spacing:.12em;margin:28px 0 12px}.gm-profit p span{float:right;color:#a0a4b0}.gm-profit hr{border:0;border-top:6px solid #10b981;border-radius:4px}.gm-profit hr:nth-of-type(n+2){border-color:#eceef1}
   .gm-orders { margin-top:18px; } .gm-panel-head a { color:#f6a900; text-decoration:none; font-size:13px; font-weight:700; } .gm-order { display:grid; grid-template-columns:70px 1.1fr 1fr 3fr 110px 90px; gap:12px; align-items:center; padding:14px 0; border-top:1px solid #f0f0f2; font-size:13px; } .gm-order>b { color:#ffb900; } .gm-order>span:nth-child(3){color:#9ca3af}.gm-order em{background:#e9fbf3;color:#10a876;border-radius:12px;padding:5px 8px;text-align:center;font-style:normal;font-size:11px;font-weight:700}
   @media (max-width:900px) { .gm-header { margin-left:-20px; margin-right:-20px; } .gm-main-grid { grid-template-columns:1fr; } .gm-order { grid-template-columns:55px 1fr 1fr; } .gm-order span:nth-child(4),.gm-order strong,.gm-order em { display:none; } }
+  .gm-profit>strong.gm-negative { color: #ef4444; }
 `;
