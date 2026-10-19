@@ -215,7 +215,7 @@
   _modalPIX(osId){
     const o=this.state.ordens.find(x=>x.id===osId)||{};
     const pixKey=localStorage.getItem('garcia_pix_key')||'';
-    const valor=parseFloat(o.valor||0);
+    const valor=Math.max(parseFloat(o.valor||0)-parseFloat(o.valor_pago||0),0);
     const clienteNome=o.clientes?.nome||'Cliente';
     const veiculo=o.veiculo||'';
 
@@ -256,6 +256,7 @@
         <button onclick="window._garcia._copiarPIX()" style="padding:12px;background:#1A1A1A;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#FFC107;cursor:pointer;letter-spacing:.5px;">📋 COPIAR CÓDIGO</button>
         <button onclick="window._garcia._whatsappPIX(${osId})" style="padding:12px;background:#25D366;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;">📱 WHATSAPP</button>
       </div>
+      <button onclick="window._garcia._modalPagamento(${osId},true)" style="width:100%;padding:10px;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;font-size:11px;font-weight:700;color:#047857;cursor:pointer;margin-bottom:10px;">✓ Recebi o pagamento — registrar como pago</button>
       <button onclick="window._garcia._configurarChavePIX()" style="width:100%;padding:8px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;font-size:10px;font-weight:600;color:#9CA3AF;cursor:pointer;">⚙️ Alterar chave PIX configurada</button>
       `}
     `);
@@ -321,7 +322,7 @@
   _whatsappPIX(osId){
     const o=this.state.ordens.find(x=>x.id===osId)||{};
     const tel=(o.clientes?.telefone||'').replace(/\D/g,'');
-    const valor=parseFloat(o.valor||0).toFixed(2).replace('.',',');
+    const valor=Math.max(parseFloat(o.valor||0)-parseFloat(o.valor_pago||0),0).toFixed(2).replace('.',',');
     const payload=window._pixPayload||'';
     const srvs=this._parseSrv(o.servico||'');
     const msg=`Olá ${o.clientes?.nome||''}! 👋\n\nSeu veículo *${o.veiculo||''}* está pronto! ✅\n\n*Valor total: R$ ${valor}*\n\nPague via PIX (Copia e Cola):\n\`${payload}\`\n\nGarcia Auto Mecânica 🔧\nCampos dos Goytacazes - RJ`;

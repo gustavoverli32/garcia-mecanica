@@ -7,8 +7,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const index = await readFile(resolve(root, 'index.html'), 'utf8');
 const normalized = index.replace(/\r\n/g, '\n');
 const actual = createHash('sha256').update(normalized).digest('hex');
-const approved = '386aeedf396bcc0e626b51b2138f64798b50fd4ac0fdd13dac9e6ca2f69a0c7a';
+const approved = '7aae785b1268fd546a88c238ef4de43af93d59cde1bd7ada992d890f78de70a2';
 if (actual !== approved) {
   throw new Error('O bundle publicado mudou. Revise visual, comportamento e dados antes de atualizar a referência aprovada.');
 }
-console.log('Bundle aprovado preservado, incluindo interface e lógica original.');
+console.log('Bundle aprovado preservado, incluindo o fluxo de OS validado.');
