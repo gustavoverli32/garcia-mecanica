@@ -250,6 +250,45 @@
     ifr.onload=()=>{ setTimeout(()=>{ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ this._toast('Erro ao abrir impressão',false); } },150); };
     ifr.srcdoc=html;
   }
+  _notaOSHTML(o){
+    const esc=value=>this._osEscape(value);
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const pagamentos=(this.state.faturamentos||[]).filter(f=>f.os_id==o.id&&f.status==='Pago');
+    const formas=[...new Set(pagamentos.map(f=>f.forma).filter(Boolean))].join(', ');
+    const logoSrc=document.querySelector('img[alt="Garcia Logo"]')?.src||'uploads/logo.png';
+    return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>OS ${esc(o.id)} finalizada - Garcia Auto Mecânica</title><style>
+      @page{size:A4;margin:18mm}body{font:14px Arial,sans-serif;color:#171717;max-width:760px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #FFC107;padding-bottom:18px}header img{max-height:54px;max-width:110px}h1{font-size:23px;margin:4px 0}.muted{color:#666;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px;margin:28px 0}.grid div{border-bottom:1px solid #ddd;padding-bottom:8px}.grid small{display:block;color:#777;font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}section{border-top:1px solid #ddd;padding:18px 0}section h2{font-size:14px;margin:0 0 10px}section p{line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.total{display:flex;justify-content:space-between;background:#FFF9E6;padding:15px;font-size:17px;font-weight:700}.paid{font-size:15px;color:#087c56;font-weight:700;margin-top:12px}footer{border-top:1px solid #ddd;color:#666;font-size:11px;margin-top:50px;padding-top:12px}@media print{body{max-width:none}}
+    </style></head><body><header><div><h1>Ordem de serviço finalizada</h1><div>Garcia Auto Mecânica · OS #${esc(o.id)}</div></div><img src="${esc(logoSrc)}" alt="Garcia Auto Mecânica"></header>
+    <div class="grid"><div><small>Cliente</small>${esc(c.nome||'Não informado')}</div><div><small>Telefone</small>${esc(c.telefone||'Não informado')}</div><div><small>Veículo</small>${esc(o.veiculo||'Não informado')}</div><div><small>Placa</small>${esc(o.placa||'Não informada')}</div><div><small>Data da OS</small>${esc(this._dfmt(o.data))}</div><div><small>Situação</small>Concluída · Pago</div></div>
+    <section><h2>Serviços executados</h2><p>${esc(this._parseSrv(o.servico)||'Não informado')}</p></section>
+    ${o.pecas?`<section><h2>Peças</h2><p>${esc(o.pecas)}</p></section>`:''}
+    ${o.observacoes?`<section><h2>Observações</h2><p>${esc(o.observacoes)}</p></section>`:''}
+    <div class="total"><span>Valor total</span><span>${esc(this._fmt(o.valor))}</span></div><div class="paid">PAGO · ${esc(this._fmt(o.valor_pago))}${formas?' · '+esc(formas):''}</div>
+    <footer>Documento gerado a partir dos dados da OS na Garcia Auto Mecânica. Guarde o PDF antes de enviá-lo ao cliente.</footer></body></html>`;
+  }
+  _imprimirNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago'||Number(o.valor_pago||0)<Number(o.valor||0))return;
+    this._printViaIframe(this._notaOSHTML(o));
+  }
+  _modalNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago'||Number(o.valor_pago||0)<Number(o.valor||0))return;
+    const esc=value=>this._osEscape(value);
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const box=document.getElementById('modal-box');
+    if(box){box.style.maxWidth='480px';}
+    this._openModal(`<div class="gm-os-note"><h2>OS #${esc(o.id)} finalizada</h2><p>Pagamento confirmado. A nota está pronta para salvar em PDF e enviar ao cliente.</p><div class="gm-os-note-paid">PAGO · ${esc(this._fmt(o.valor_pago))}</div><p>${esc(c.nome||'Cliente')} · ${esc(o.veiculo||'Veículo')}</p><div class="gm-os-detail-actions"><button type="button" class="gm-os-action" onclick="window._garcia._imprimirNotaOS(${Number(o.id)})">Imprimir / salvar PDF</button><button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._whatsappNotaOS(${Number(o.id)})">Abrir WhatsApp</button></div><p class="gm-os-note-help">No WhatsApp, anexe manualmente o PDF salvo. O documento não é enviado automaticamente.</p><button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._closeModal()">Fechar</button></div>`);
+  }
+  _whatsappNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago')return;
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const tel=String(c.telefone||'').replace(/\D/g,'');
+    const numero=tel.startsWith('55')?tel:'55'+tel;
+    const msg=`Olá ${c.nome||''}! Sua ordem de serviço #${o.id} da Garcia Auto Mecânica foi finalizada e o pagamento confirmado. Vamos enviar o documento em PDF nesta conversa.`;
+    window.open(`https://wa.me/${tel?numero:''}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+  }
   _checklistHTML(os){
     const nome=os?.clientes?.nome||this.state.clientes.find(x=>x.id===os?.cliente_id)?.nome||'';
     const veiculo=os?.veiculo||'';
@@ -327,7 +366,7 @@
     const html=this._checklistHTML(os);
     this._printViaIframe(html);
   }
-  _modalPagamento(osId){
+  _modalPagamento(osId,somentePagamento=false){
     const o=this.state.ordens.find(x=>x.id===osId);
     if(!o)return;
     const jaPago=parseFloat(o.valor_pago||0);
@@ -350,7 +389,7 @@
     this._openModal(`
       <div style="text-align:center;padding:8px 0 16px;">
         <div style="width:56px;height:56px;background:#ECFDF5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;">✓</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">OS #${o.id} Concluída!</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">Registrar pagamento da OS #${o.id}</div>
         <div style="font-size:12px;color:#6B7280;margin-bottom:20px;">${o.clientes?.nome||'Cliente'} · ${o.veiculo||''}</div>
         <div style="background:#F9FAFB;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #F0F0F0;display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;">
           <div><div style="font-size:10px;color:#9CA3AF;">Valor da OS</div><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;">${this._fmt(o.valor)}</div></div>
@@ -367,7 +406,7 @@
         </div>
         <input type="hidden" id="pg-forma-sel" value="">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <button onclick="window._garcia._confirmarPagamento(${osId},false)" style="padding:11px;background:#F3F4F6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;">Ainda não</button>
+          <button onclick="${somentePagamento?'window._garcia._closeModal()':`window._garcia._confirmarPagamento(${osId},false)`}" style="padding:11px;background:#F3F4F6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;">${somentePagamento?'Cancelar':'Concluir sem pagamento'}</button>
           <button onclick="window._garcia._confirmarPagamento(${osId},true)" style="padding:11px;background:#10B981;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;">REGISTRAR PAGAMENTO</button>
         </div>
       </div>`);
@@ -394,18 +433,27 @@
 
   async _confirmarPagamento(osId,recebido){
     const o=this.state.ordens.find(x=>x.id===osId);
+    if(!o)return;
+    if(this._pagamentoEmAndamento)return;
     const jaPago=parseFloat(o?.valor_pago||0);
     const valorOS=parseFloat(o?.valor||0);
-    const recebidoAgora=recebido?Math.max(parseFloat(document.getElementById('pg-valor')?.value||0),0):0;
+    const entrada=Number(document.getElementById('pg-valor')?.value||0);
+    const recebidoArredondado=Math.round(entrada*100)/100;
+    if(recebido&&(!Number.isFinite(entrada)||entrada<=0||Math.abs(entrada-recebidoArredondado)>0.000001||recebidoArredondado>Math.max(valorOS-jaPago,0)+0.000001)){this._toast('Informe um valor válido até o saldo da OS, com no máximo duas casas decimais.',false);return;}
+    if(recebido&&!document.getElementById('pg-forma-sel')?.value){this._toast('Selecione a forma de pagamento.',false);return;}
+    const recebidoAgora=recebido?recebidoArredondado:0;
     const novoPago=Math.min(jaPago+recebidoAgora,valorOS);
     const statusPg=novoPago<=0?'Pendente':(novoPago>=valorOS?'Pago':'Parcial');
     /* captura dados de comissão antes de fechar o modal */
     const comBase=parseFloat(document.getElementById('pg-com-base')?.value||0);
     const comPct=parseFloat(document.getElementById('pg-com-pct')?.value||0);
+    this._pagamentoEmAndamento=true;
+    try{
     const {error:errOS}=await this._db.from('ordens').update({status:'Concluída',valor_pago:novoPago,status_pagamento:statusPg}).eq('id',osId);
     if(errOS){this._toast('Erro ao concluir OS',false);return;}
+    let receitaRegistrada=true;
     if(recebidoAgora>0){
-      const forma=document.getElementById('pg-forma-sel')?.value||'Pix';
+      const forma=document.getElementById('pg-forma-sel')?.value;
       const {error:errFat}=await this._db.from('faturamentos').insert({
         cliente_id:o?.cliente_id||null,
         os_id:o?.id||null,
@@ -414,13 +462,13 @@
         forma,
         status:'Pago',
       });
-      if(errFat){this._toast('OS concluída, mas erro ao registrar receita: '+errFat.message,false);}
+      if(errFat){receitaRegistrada=false;this._toast('OS concluída, mas erro ao registrar receita: '+errFat.message,false);}
       else{this._toast(statusPg==='Parcial'?'Pagamento parcial registrado! Falta '+this._fmt(valorOS-novoPago):'OS concluída e receita registrada!');}
     } else {
       this._toast('OS marcada como concluída!'+(statusPg!=='Pago'?' Pagamento pendente.':''));
     }
     /* Comissão do mecânico — registrada quando a OS fica totalmente paga */
-    if(statusPg==='Pago'){
+    if(statusPg==='Pago'&&receitaRegistrada){
       const mec=this._mecDaOS(o);
       const comVal=comBase*comPct/100;
       if(mec&&comVal>0&&!this._getFPags(mec).some(p=>p.tipo==='Comissão'&&p.os_id===osId)){
@@ -442,5 +490,8 @@
     }
     this._closeModal();
     await this._load();
+    if(statusPg==='Pago'&&receitaRegistrada)setTimeout(()=>this._modalNotaOS(osId),0);
+    }catch(e){this._toast('Falha ao registrar pagamento. Confira a OS e o financeiro antes de tentar novamente.',false);}
+    finally{this._pagamentoEmAndamento=false;}
   }
 

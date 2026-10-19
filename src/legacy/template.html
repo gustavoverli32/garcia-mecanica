@@ -332,8 +332,74 @@ input,select,textarea,button{font-family:'Montserrat',sans-serif}
 .gm-tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .gm-tw table{min-width:640px;}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!important;box-shadow:0 0 0 3px rgba(255,193,7,.12)!important}
+.gm-os-page{display:flex;flex-direction:column;gap:18px}
+.gm-os-flow-panel,.gm-os-history-panel{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);padding:20px;min-width:0}
+.gm-os-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.gm-os-section-head h2{font-family:'Rajdhani',sans-serif;font-size:19px;color:#111;line-height:1.2}
+.gm-os-section-head p{font-size:11px;color:#9CA3AF;line-height:1.5;margin-top:3px}
+.gm-os-total{background:#FFFBEB;color:#92400E;padding:6px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.gm-os-flow-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:7px}
+.gm-os-flow{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:11px;min-width:925px;align-items:start}
+.gm-os-stage{background:#F6F7F9;border-radius:12px;padding:10px;min-width:0}
+.gm-os-stage-drop{background:#FFFBEB;outline:2px dashed #FFC107;outline-offset:-2px}
+.gm-os-stage-title{display:flex;align-items:center;gap:7px;min-height:30px;padding:1px 3px 10px}
+.gm-os-stage-title h3{font-size:11px;font-weight:700;color:#374151;flex:1}
+.gm-os-stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gm-os-stage-count{background:#fff;border-radius:20px;min-width:22px;padding:3px 6px;text-align:center;font-size:10px;font-weight:700;color:#6B7280}
+.gm-os-stage-list{display:flex;flex-direction:column;gap:9px;min-height:130px}
+.gm-os-stage-empty{display:flex;align-items:center;justify-content:center;text-align:center;min-height:124px;border:1px dashed #E5E7EB;border-radius:10px;color:#9CA3AF;font-size:11px;padding:12px}
+.gm-os-card{display:flex;flex-direction:column;gap:10px;text-align:left;width:100%;min-height:168px;background:#fff;border:1px solid #E9EAED;border-radius:12px;padding:13px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.04);color:#374151}
+.gm-os-card:hover{border-color:#FFC107;box-shadow:0 3px 10px rgba(0,0,0,.09)}
+.gm-os-card[draggable="true"]{cursor:grab}.gm-os-card[draggable="true"]:active{cursor:grabbing}.gm-os-card-dragging{opacity:.45}
+.gm-os-card:focus-visible,.gm-os-action:focus-visible,.gm-os-period:focus-visible,.gm-os-detail-close:focus-visible{outline:3px solid #FFC107;outline-offset:2px}
+.gm-os-card-top,.gm-os-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;font-size:10px;color:#9CA3AF}
+.gm-os-card-top strong{color:#B45309;font-weight:700}
+.gm-os-card-vehicle{font-size:13px;font-weight:700;color:#111;line-height:1.3;overflow-wrap:anywhere}
+.gm-os-plate{background:#F3F4F6;border-radius:5px;padding:3px 6px;font-size:9px;font-weight:700;color:#6B7280;align-self:flex-start}
+.gm-os-card-service{font-size:10px;color:#6B7280;line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:29px}
+.gm-os-card-bottom{margin-top:auto;border-top:1px solid #F3F4F6;padding-top:8px;color:#6B7280}
+.gm-os-card-bottom span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gm-os-card-bottom strong{color:#111;white-space:nowrap;font-size:11px}
+.gm-os-card-history{min-height:154px}
+.gm-os-card-payment{font-size:9px;font-weight:700;color:#059669}
+.gm-os-history-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.gm-os-search-label,.gm-os-month-label{display:flex;flex-direction:column;gap:5px;font-size:10px;color:#6B7280;font-weight:700}
+.gm-os-search-label{flex:1 1 260px}
+.gm-os-search-label input,.gm-os-month-label select{border:1px solid #E5E7EB;border-radius:8px;padding:9px 11px;background:#fff;color:#374151;font-size:11px;min-height:36px}
+.gm-os-periods{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:15px}
+.gm-os-periods>span{font-size:10px;color:#9CA3AF;font-weight:700;margin-right:2px}
+.gm-os-period{border:1px solid #E5E7EB;border-radius:20px;background:#fff;padding:6px 10px;font-size:10px;color:#6B7280;cursor:pointer}
+.gm-os-period.active{background:#1A1A1A;border-color:#1A1A1A;color:#FFC107;font-weight:700}
+.gm-os-history-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.gm-os-history-item[hidden],.gm-os-history-empty[hidden]{display:none!important}
+.gm-os-history-empty{text-align:center;padding:22px;color:#9CA3AF;font-size:12px}
+.gm-os-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.gm-os-detail-number{font-size:11px;color:#B45309;font-weight:700}
+.gm-os-detail-head h2{font-family:'Rajdhani',sans-serif;font-size:23px;color:#111;margin-top:3px;line-height:1.1}
+.gm-os-client-link{border:0;background:transparent;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:#FFC107;text-underline-offset:4px}.gm-os-client-link:hover{color:#B45309}.gm-os-client-link:focus-visible{outline:3px solid #FFC107;outline-offset:2px;border-radius:3px}
+.gm-os-detail-head p{font-size:12px;color:#6B7280;margin-top:5px}
+.gm-os-detail-close{border:0;border-radius:8px;background:#F3F4F6;color:#374151;width:32px;height:32px;font-size:20px;cursor:pointer;flex-shrink:0}
+.gm-os-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px}
+.gm-os-detail-grid>div{display:flex;flex-direction:column;gap:4px;background:#F9FAFB;border-radius:9px;padding:11px;min-width:0}
+.gm-os-detail-grid span{font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:#9CA3AF}
+.gm-os-detail-grid strong{font-size:12px;color:#374151;overflow-wrap:anywhere}
+.gm-os-detail-section{border-top:1px solid #F3F4F6;padding:13px 0}
+.gm-os-detail-section h3{font-size:11px;color:#111;margin-bottom:6px}
+.gm-os-detail-section p{font-size:12px;color:#6B7280;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.gm-os-detail-total{display:flex;justify-content:space-between;align-items:center;background:#FFFBEB;border-radius:9px;padding:12px;font-size:11px;color:#6B7280;margin:7px 0 15px}
+.gm-os-detail-total strong{font-family:'Rajdhani',sans-serif;font-size:19px;color:#111}
+.gm-os-detail-actions{display:flex;gap:9px;flex-wrap:wrap}
+.gm-os-action{border:0;border-radius:8px;background:#FFC107;color:#111;font-size:11px;font-weight:700;padding:10px 12px;cursor:pointer;flex:1 1 170px}
+.gm-os-action-secondary{background:#F3F4F6;color:#374151}
+.gm-os-detail-more{margin-top:9px}
+.gm-os-action-danger{background:#FEF2F2;color:#DC2626}
+.gm-os-action:disabled{opacity:.45;cursor:not-allowed}.gm-os-stage-actions{margin-bottom:9px}.gm-os-note h2{font-family:'Rajdhani',sans-serif;font-size:21px;color:#111;margin:0 0 8px}.gm-os-note p{font-size:12px;color:#6B7280;line-height:1.5;margin:0 0 14px}.gm-os-note-paid{background:#ECFDF5;color:#047857;font-size:16px;font-weight:700;border-radius:9px;padding:14px;margin-bottom:14px}.gm-os-note .gm-os-detail-actions{margin-bottom:12px}.gm-os-note .gm-os-note-help{font-size:10px;color:#92400E}
+@media (max-width:1200px){.gm-os-flow{min-width:0;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){.gm-os-flow-panel,.gm-os-history-panel{padding:14px}.gm-os-section-head{flex-wrap:wrap}.gm-os-detail-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:500px){.gm-os-flow{grid-template-columns:1fr}.gm-os-detail-grid{grid-template-columns:1fr}.gm-os-history-list{grid-template-columns:1fr}}
 </style>
 </helmet>
+
 
 <!-- LOGIN -->
 <sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ true }}">
@@ -567,6 +633,8 @@ class Component extends DCLogic {
 
   /* Lança automaticamente o salário de cada funcionário como despesa recorrente do mês (1x por mês) */
   async _autoSalarios(){
+    // O preview local consulta dados reais; nunca deve gerar despesas durante testes visuais.
+    if(['localhost','127.0.0.1'].includes(location.hostname))return;
     if(this._autoSalRunning)return; this._autoSalRunning=true;
     try{
       const {funcionarios,despesas}=this.state;
@@ -1102,6 +1170,45 @@ class Component extends DCLogic {
     ifr.onload=()=>{ setTimeout(()=>{ try{ ifr.contentWindow.focus(); ifr.contentWindow.print(); }catch(e){ this._toast('Erro ao abrir impressão',false); } },150); };
     ifr.srcdoc=html;
   }
+  _notaOSHTML(o){
+    const esc=value=>this._osEscape(value);
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const pagamentos=(this.state.faturamentos||[]).filter(f=>f.os_id==o.id&&f.status==='Pago');
+    const formas=[...new Set(pagamentos.map(f=>f.forma).filter(Boolean))].join(', ');
+    const logoSrc=document.querySelector('img[alt="Garcia Logo"]')?.src||'uploads/logo.png';
+    return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>OS ${esc(o.id)} finalizada - Garcia Auto Mecânica</title><style>
+      @page{size:A4;margin:18mm}body{font:14px Arial,sans-serif;color:#171717;max-width:760px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #FFC107;padding-bottom:18px}header img{max-height:54px;max-width:110px}h1{font-size:23px;margin:4px 0}.muted{color:#666;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px;margin:28px 0}.grid div{border-bottom:1px solid #ddd;padding-bottom:8px}.grid small{display:block;color:#777;font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}section{border-top:1px solid #ddd;padding:18px 0}section h2{font-size:14px;margin:0 0 10px}section p{line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.total{display:flex;justify-content:space-between;background:#FFF9E6;padding:15px;font-size:17px;font-weight:700}.paid{font-size:15px;color:#087c56;font-weight:700;margin-top:12px}footer{border-top:1px solid #ddd;color:#666;font-size:11px;margin-top:50px;padding-top:12px}@media print{body{max-width:none}}
+    </style></head><body><header><div><h1>Ordem de serviço finalizada</h1><div>Garcia Auto Mecânica · OS #${esc(o.id)}</div></div><img src="${esc(logoSrc)}" alt="Garcia Auto Mecânica"></header>
+    <div class="grid"><div><small>Cliente</small>${esc(c.nome||'Não informado')}</div><div><small>Telefone</small>${esc(c.telefone||'Não informado')}</div><div><small>Veículo</small>${esc(o.veiculo||'Não informado')}</div><div><small>Placa</small>${esc(o.placa||'Não informada')}</div><div><small>Data da OS</small>${esc(this._dfmt(o.data))}</div><div><small>Situação</small>Concluída · Pago</div></div>
+    <section><h2>Serviços executados</h2><p>${esc(this._parseSrv(o.servico)||'Não informado')}</p></section>
+    ${o.pecas?`<section><h2>Peças</h2><p>${esc(o.pecas)}</p></section>`:''}
+    ${o.observacoes?`<section><h2>Observações</h2><p>${esc(o.observacoes)}</p></section>`:''}
+    <div class="total"><span>Valor total</span><span>${esc(this._fmt(o.valor))}</span></div><div class="paid">PAGO · ${esc(this._fmt(o.valor_pago))}${formas?' · '+esc(formas):''}</div>
+    <footer>Documento gerado a partir dos dados da OS na Garcia Auto Mecânica. Guarde o PDF antes de enviá-lo ao cliente.</footer></body></html>`;
+  }
+  _imprimirNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago'||Number(o.valor_pago||0)<Number(o.valor||0))return;
+    this._printViaIframe(this._notaOSHTML(o));
+  }
+  _modalNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago'||Number(o.valor_pago||0)<Number(o.valor||0))return;
+    const esc=value=>this._osEscape(value);
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const box=document.getElementById('modal-box');
+    if(box){box.style.maxWidth='480px';}
+    this._openModal(`<div class="gm-os-note"><h2>OS #${esc(o.id)} finalizada</h2><p>Pagamento confirmado. A nota está pronta para salvar em PDF e enviar ao cliente.</p><div class="gm-os-note-paid">PAGO · ${esc(this._fmt(o.valor_pago))}</div><p>${esc(c.nome||'Cliente')} · ${esc(o.veiculo||'Veículo')}</p><div class="gm-os-detail-actions"><button type="button" class="gm-os-action" onclick="window._garcia._imprimirNotaOS(${Number(o.id)})">Imprimir / salvar PDF</button><button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._whatsappNotaOS(${Number(o.id)})">Abrir WhatsApp</button></div><p class="gm-os-note-help">No WhatsApp, anexe manualmente o PDF salvo. O documento não é enviado automaticamente.</p><button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._closeModal()">Fechar</button></div>`);
+  }
+  _whatsappNotaOS(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status!=='Concluída'||o.status_pagamento!=='Pago')return;
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const tel=String(c.telefone||'').replace(/\D/g,'');
+    const numero=tel.startsWith('55')?tel:'55'+tel;
+    const msg=`Olá ${c.nome||''}! Sua ordem de serviço #${o.id} da Garcia Auto Mecânica foi finalizada e o pagamento confirmado. Vamos enviar o documento em PDF nesta conversa.`;
+    window.open(`https://wa.me/${tel?numero:''}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+  }
   _checklistHTML(os){
     const nome=os?.clientes?.nome||this.state.clientes.find(x=>x.id===os?.cliente_id)?.nome||'';
     const veiculo=os?.veiculo||'';
@@ -1179,7 +1286,7 @@ class Component extends DCLogic {
     const html=this._checklistHTML(os);
     this._printViaIframe(html);
   }
-  _modalPagamento(osId){
+  _modalPagamento(osId,somentePagamento=false){
     const o=this.state.ordens.find(x=>x.id===osId);
     if(!o)return;
     const jaPago=parseFloat(o.valor_pago||0);
@@ -1202,7 +1309,7 @@ class Component extends DCLogic {
     this._openModal(`
       <div style="text-align:center;padding:8px 0 16px;">
         <div style="width:56px;height:56px;background:#ECFDF5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;">✓</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">OS #${o.id} Concluída!</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">Registrar pagamento da OS #${o.id}</div>
         <div style="font-size:12px;color:#6B7280;margin-bottom:20px;">${o.clientes?.nome||'Cliente'} · ${o.veiculo||''}</div>
         <div style="background:#F9FAFB;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #F0F0F0;display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;">
           <div><div style="font-size:10px;color:#9CA3AF;">Valor da OS</div><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#111;">${this._fmt(o.valor)}</div></div>
@@ -1219,7 +1326,7 @@ class Component extends DCLogic {
         </div>
         <input type="hidden" id="pg-forma-sel" value="">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <button onclick="window._garcia._confirmarPagamento(${osId},false)" style="padding:11px;background:#F3F4F6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;">Ainda não</button>
+          <button onclick="${somentePagamento?'window._garcia._closeModal()':`window._garcia._confirmarPagamento(${osId},false)`}" style="padding:11px;background:#F3F4F6;border:none;border-radius:9px;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;">${somentePagamento?'Cancelar':'Concluir sem pagamento'}</button>
           <button onclick="window._garcia._confirmarPagamento(${osId},true)" style="padding:11px;background:#10B981;border:none;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;">REGISTRAR PAGAMENTO</button>
         </div>
       </div>`);
@@ -1246,18 +1353,27 @@ class Component extends DCLogic {
 
   async _confirmarPagamento(osId,recebido){
     const o=this.state.ordens.find(x=>x.id===osId);
+    if(!o)return;
+    if(this._pagamentoEmAndamento)return;
     const jaPago=parseFloat(o?.valor_pago||0);
     const valorOS=parseFloat(o?.valor||0);
-    const recebidoAgora=recebido?Math.max(parseFloat(document.getElementById('pg-valor')?.value||0),0):0;
+    const entrada=Number(document.getElementById('pg-valor')?.value||0);
+    const recebidoArredondado=Math.round(entrada*100)/100;
+    if(recebido&&(!Number.isFinite(entrada)||entrada<=0||Math.abs(entrada-recebidoArredondado)>0.000001||recebidoArredondado>Math.max(valorOS-jaPago,0)+0.000001)){this._toast('Informe um valor válido até o saldo da OS, com no máximo duas casas decimais.',false);return;}
+    if(recebido&&!document.getElementById('pg-forma-sel')?.value){this._toast('Selecione a forma de pagamento.',false);return;}
+    const recebidoAgora=recebido?recebidoArredondado:0;
     const novoPago=Math.min(jaPago+recebidoAgora,valorOS);
     const statusPg=novoPago<=0?'Pendente':(novoPago>=valorOS?'Pago':'Parcial');
     /* captura dados de comissão antes de fechar o modal */
     const comBase=parseFloat(document.getElementById('pg-com-base')?.value||0);
     const comPct=parseFloat(document.getElementById('pg-com-pct')?.value||0);
+    this._pagamentoEmAndamento=true;
+    try{
     const {error:errOS}=await this._db.from('ordens').update({status:'Concluída',valor_pago:novoPago,status_pagamento:statusPg}).eq('id',osId);
     if(errOS){this._toast('Erro ao concluir OS',false);return;}
+    let receitaRegistrada=true;
     if(recebidoAgora>0){
-      const forma=document.getElementById('pg-forma-sel')?.value||'Pix';
+      const forma=document.getElementById('pg-forma-sel')?.value;
       const {error:errFat}=await this._db.from('faturamentos').insert({
         cliente_id:o?.cliente_id||null,
         os_id:o?.id||null,
@@ -1266,13 +1382,13 @@ class Component extends DCLogic {
         forma,
         status:'Pago',
       });
-      if(errFat){this._toast('OS concluída, mas erro ao registrar receita: '+errFat.message,false);}
+      if(errFat){receitaRegistrada=false;this._toast('OS concluída, mas erro ao registrar receita: '+errFat.message,false);}
       else{this._toast(statusPg==='Parcial'?'Pagamento parcial registrado! Falta '+this._fmt(valorOS-novoPago):'OS concluída e receita registrada!');}
     } else {
       this._toast('OS marcada como concluída!'+(statusPg!=='Pago'?' Pagamento pendente.':''));
     }
     /* Comissão do mecânico — registrada quando a OS fica totalmente paga */
-    if(statusPg==='Pago'){
+    if(statusPg==='Pago'&&receitaRegistrada){
       const mec=this._mecDaOS(o);
       const comVal=comBase*comPct/100;
       if(mec&&comVal>0&&!this._getFPags(mec).some(p=>p.tipo==='Comissão'&&p.os_id===osId)){
@@ -1294,6 +1410,9 @@ class Component extends DCLogic {
     }
     this._closeModal();
     await this._load();
+    if(statusPg==='Pago'&&receitaRegistrada)setTimeout(()=>this._modalNotaOS(osId),0);
+    }catch(e){this._toast('Falha ao registrar pagamento. Confira a OS e o financeiro antes de tentar novamente.',false);}
+    finally{this._pagamentoEmAndamento=false;}
   }
 
   _modalCli(){
@@ -1715,7 +1834,7 @@ class Component extends DCLogic {
   _modalPIX(osId){
     const o=this.state.ordens.find(x=>x.id===osId)||{};
     const pixKey=localStorage.getItem('garcia_pix_key')||'';
-    const valor=parseFloat(o.valor||0);
+    const valor=Math.max(parseFloat(o.valor||0)-parseFloat(o.valor_pago||0),0);
     const clienteNome=o.clientes?.nome||'Cliente';
     const veiculo=o.veiculo||'';
 
@@ -1756,6 +1875,7 @@ class Component extends DCLogic {
         <button onclick="window._garcia._copiarPIX()" style="padding:12px;background:#1A1A1A;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#FFC107;cursor:pointer;letter-spacing:.5px;">📋 COPIAR CÓDIGO</button>
         <button onclick="window._garcia._whatsappPIX(${osId})" style="padding:12px;background:#25D366;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;">📱 WHATSAPP</button>
       </div>
+      <button onclick="window._garcia._modalPagamento(${osId},true)" style="width:100%;padding:10px;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;font-size:11px;font-weight:700;color:#047857;cursor:pointer;margin-bottom:10px;">✓ Recebi o pagamento — registrar como pago</button>
       <button onclick="window._garcia._configurarChavePIX()" style="width:100%;padding:8px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;font-size:10px;font-weight:600;color:#9CA3AF;cursor:pointer;">⚙️ Alterar chave PIX configurada</button>
       `}
     `);
@@ -1821,7 +1941,7 @@ class Component extends DCLogic {
   _whatsappPIX(osId){
     const o=this.state.ordens.find(x=>x.id===osId)||{};
     const tel=(o.clientes?.telefone||'').replace(/\D/g,'');
-    const valor=parseFloat(o.valor||0).toFixed(2).replace('.',',');
+    const valor=Math.max(parseFloat(o.valor||0)-parseFloat(o.valor_pago||0),0).toFixed(2).replace('.',',');
     const payload=window._pixPayload||'';
     const srvs=this._parseSrv(o.servico||'');
     const msg=`Olá ${o.clientes?.nome||''}! 👋\n\nSeu veículo *${o.veiculo||''}* está pronto! ✅\n\n*Valor total: R$ ${valor}*\n\nPague via PIX (Copia e Cola):\n\`${payload}\`\n\nGarcia Auto Mecânica 🔧\nCampos dos Goytacazes - RJ`;
@@ -2143,56 +2263,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     }
 
     else if(page==='os'){
-      const omf=osMonthFilter||curKey;
-      const period=this.state.osPeriodFilter||'todos';
-      const cutoffStr=(days)=>{const dt=new Date();dt.setDate(dt.getDate()-days);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
-      const hojeStr=cutoffStr(0);
-      const periodDays={hoje:0,semana:7,q15:15};
-      const monthScoped=period!=='todos'
-        ?ordens.filter(o=>(o.data||'')>=cutoffStr(periodDays[period])&&(o.data||'')<=hojeStr)
-        :ordens.filter(o=>o.status!=='Concluída'||this._mkey(o.data)===omf);
-      const filterMap={todos:null,ag:'Aguardando',and:'Em Andamento',peca:'Aguardando Peça',pag:'Aguardando Pagamento',conc:'Concluída'};
-      const filtered=filterMap[osFilter]?monthScoped.filter(o=>o.status===filterMap[osFilter]):monthScoped;
-      const monthOptsOS=this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===omf?'selected':''}>${m.label}</option>`).join('');
-      const rows=filtered.map(o=>`<tr style="border-bottom:1px solid #F9F9F9;">
-        <td style="${TD}color:#FFC107;font-weight:700;">#${o.id}</td>
-        <td style="${TD}font-weight:600;color:#374151;">${o.clientes?.nome||'—'}</td>
-        <td style="${TD}color:#9CA3AF;font-size:11px;">${o.veiculo||'—'}</td>
-        <td style="${TD}">${this._parseSrv(o.servico)}</td>
-        <td style="${TD}color:#6B7280;font-size:11px;font-weight:600;">${this._parseMec(o.servico)}</td>
-        <td style="${TD}color:#9CA3AF;font-size:11px;">${this._dfmt(o.data)}</td>
-        <td style="${TD}text-align:right;font-weight:700;">${this._fmt(o.valor)}</td>
-        <td style="padding:10px 16px;text-align:center;">
-          <span style="${this._stStyle(o.status)}">${o.status}</span>
-          ${o.status==='Concluída'&&o.status_pagamento&&o.status_pagamento!=='Pago'?`<div style="margin-top:4px;"><span style="background:#FEF2F2;color:#DC2626;font-size:8px;font-weight:700;padding:2px 7px;border-radius:20px;">${o.status_pagamento==='Parcial'?'Falta '+this._fmt((parseFloat(o.valor||0))-(parseFloat(o.valor_pago||0))):'Pendente'}</span></div>`:''}
-        </td>
-        <td style="padding:10px 16px;text-align:center;">
-          <button onclick="window._garcia._toggleAcoesMenu(${o.id},event)" style="background:#F3F4F6;border:none;border-radius:6px;width:30px;height:30px;font-size:15px;color:#374151;cursor:pointer;">⋮</button>
-          <div id="acoes-menu-${o.id}" style="display:none;position:fixed;background:#fff;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:9999;min-width:170px;overflow:hidden;text-align:left;">
-            <button onclick="window._garcia._editarOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">✏️ Editar OS</button>
-            <button onclick="window._garcia._modalOrcamento(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">📄 Gerar Orçamento</button>
-            <button onclick="window._garcia.concluirOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">${o.status==='Aguardando Pagamento'||(o.status==='Concluída'&&parseFloat(o.valor_pago||0)<parseFloat(o.valor||0))?'💰 Registrar Pagamento Restante':'✓ Concluir OS'}</button>
-            <button onclick="window._garcia._modalPIX(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">💠 Cobrar via PIX</button>
-            <button onclick="window._garcia.excluirOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;border-top:1px solid #F3F4F6;padding:10px 14px;font-size:12px;font-weight:600;color:#DC2626;cursor:pointer;">✕ Excluir OS</button>
-          </div>
-        </td></tr>`).join('');
-      const fBtn=(k,l)=>`<button onclick="window._garcia.setFilter('${k}')" style="background:${osFilter===k?'#FFC107':'#fff'};border:${osFilter===k?'none':'1px solid #E5E7EB'};border-radius:20px;padding:6px 14px;font-size:11px;font-weight:${osFilter===k?'700':'500'};color:${osFilter===k?'#000':'#6B7280'};cursor:pointer;">${l}</button>`;
-      const pBtn=(k,l)=>`<button onclick="window._garcia.setOSPeriodFilter('${k}')" style="background:${period===k?'#1A1A1A':'#fff'};border:${period===k?'none':'1px solid #E5E7EB'};border-radius:20px;padding:6px 14px;font-size:11px;font-weight:${period===k?'700':'500'};color:${period===k?'#FFC107':'#6B7280'};cursor:pointer;">${l}</button>`;
-      el.innerHTML=`<div style="animation:fadeIn .25s ease;">
-        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-          ${fBtn('todos','Todos ('+monthScoped.length+')')}${fBtn('ag','Aguardando')}${fBtn('and','Em Andamento')}${fBtn('peca','Aguard. Peça')}${fBtn('pag','Aguard. Pagamento')}${fBtn('conc','Concluída')}
-          <span style="flex:1;"></span>
-          <span style="font-size:11px;color:#9CA3AF;font-weight:600;">Mês:</span>
-          <select onchange="window._garcia.setOSMonthFilter(this.value)" style="padding:8px 12px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer;">${monthOptsOS}</select>
-        </div>
-        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-          <span style="font-size:11px;color:#9CA3AF;font-weight:600;">Período:</span>
-          ${pBtn('todos','Todos')}${pBtn('hoje','Hoje')}${pBtn('semana','Últimos 7 dias')}${pBtn('q15','Últimos 15 dias')}
-        </div>
-        <div style="font-size:10px;color:#9CA3AF;margin:-8px 0 12px;">OS em aberto aparecem sempre; concluídas somem da lista no mês seguinte (ainda ficam no histórico do mês selecionado).</div>
-        <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);overflow:hidden;overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;min-width:900px;"><thead><tr style="background:#FAFAFA;"><th style="${TH}">OS#</th><th style="${TH}">Cliente</th><th style="${TH}">Veículo</th><th style="${TH}">Serviço(s)</th><th style="${TH}">Mecânico</th><th style="${TH}">Data</th><th style="${TH}text-align:right">Valor</th><th style="${TH}text-align:center">Status</th><th style="${TH}text-align:center">Ações</th></tr></thead><tbody>${rows||'<tr><td colspan="9" style="padding:24px;text-align:center;color:#9CA3AF;font-size:13px;">Nenhum registro encontrado</td></tr>'}</tbody></table>
-        </div></div>`;
+      this._renderOSFlow(el);
     }
 
     else if(page==='clientes'){
@@ -3076,6 +3147,174 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
       setTimeout(()=>document.addEventListener('click',close),0);
     }
   }
+  _osEscape(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  _osCard(o,compact=false){
+    const esc=(value)=>this._osEscape(value);
+    const nome=o.clientes?.nome||this.state.clientes.find(c=>c.id==o.cliente_id)?.nome||'Cliente não informado';
+    const servico=this._parseSrv(o.servico);
+    return `<button type="button" class="gm-os-card${compact?' gm-os-card-history':''}" ${compact?'':`draggable="true" ondragstart="window._garcia._iniciarArrasteOS(event,${Number(o.id)})" ondragend="window._garcia._terminarArrasteOS()"`} onclick="window._garcia._clicarCardOS(${Number(o.id)})" aria-label="Abrir atendimento da OS ${Number(o.id)} de ${esc(nome)}">
+      <span class="gm-os-card-top"><strong>#${esc(o.id)}</strong><span>${esc(this._dfmt(o.data))}</span></span>
+      <span class="gm-os-card-vehicle">${esc(o.veiculo||'Veículo não informado')}</span>
+      ${o.placa?`<span class="gm-os-plate">${esc(o.placa)}</span>`:''}
+      <span class="gm-os-card-service">${esc(servico)}</span>
+      <span class="gm-os-card-bottom"><span>${esc(nome)}</span><strong>${esc(this._fmt(o.valor))}</strong></span>
+      ${compact?`<span class="gm-os-card-payment">${esc(o.status_pagamento||'Concluída')}</span>`:''}
+    </button>`;
+  }
+  _renderOSFlow(el){
+    const ordens=this.state.ordens||[];
+    const abertas=ordens.filter(o=>o.status!=='Concluída');
+    const concluidas=ordens.filter(o=>o.status==='Concluída');
+    const etapas=[
+      {status:'Aguardando',label:'Aguardando',color:'#818CF8'},
+      {status:'Em Andamento',label:'Em andamento',color:'#FFC107'},
+      {status:'Aguardando Peça',label:'Aguardando peça',color:'#FF8C00'},
+      {status:'Aguardando Pagamento',label:'Aguardando pagamento',color:'#EF4444'},
+    ];
+    const conhecidos=etapas.map(e=>e.status);
+    const mes=this.state.osMonthFilter||'all';
+    const periodo=this.state.osPeriodFilter||'todos';
+    const hoje=this._today();
+    const limite=(dias)=>{const d=new Date();d.setDate(d.getDate()-dias);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+    const dias={hoje:0,semana:7,q15:15};
+    const historico=concluidas.filter(o=>{
+      if(mes!=='all'&&this._mkey(o.data)!==mes)return false;
+      if(periodo!=='todos'&&((o.data||'')<limite(dias[periodo])||(o.data||'')>hoje))return false;
+      return true;
+    });
+    const colunas=etapas.map((etapa,index)=>{
+      const itens=abertas.filter(o=>o.status===etapa.status||(index===0&&!conhecidos.includes(o.status)));
+      return `<section class="gm-os-stage" aria-label="${etapa.label}" ondragover="window._garcia._sobreEtapaOS(event)" ondragleave="window._garcia._sairEtapaOS(event)" ondrop="window._garcia._soltarOSEtapa(event,'${etapa.status}')">
+        <div class="gm-os-stage-title"><span class="gm-os-stage-dot" style="background:${etapa.color}"></span><h3>${etapa.label}</h3><span class="gm-os-stage-count">${itens.length}</span></div>
+        <div class="gm-os-stage-list">${itens.length?itens.map(o=>this._osCard(o)).join(''):'<p class="gm-os-stage-empty">Nenhuma OS nesta etapa</p>'}</div>
+      </section>`;
+    }).join('');
+    const meses=`<option value="all" ${mes==='all'?'selected':''}>Todos os meses</option>`+this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===mes?'selected':''}>${m.label}</option>`).join('');
+    const periodos=[['todos','Todos'],['hoje','Hoje'],['semana','Últimos 7 dias'],['q15','Últimos 15 dias']].map(([key,label])=>`<button type="button" class="gm-os-period${periodo===key?' active':''}" aria-pressed="${periodo===key}" onclick="window._garcia.setOSPeriodFilter('${key}')">${label}</button>`).join('');
+    el.innerHTML=`<div class="gm-os-page" style="animation:fadeIn .25s ease;">
+      <section class="gm-os-flow-panel" aria-label="Fluxo de atendimento">
+        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div>
+        <div class="gm-os-flow-scroll"><div class="gm-os-flow">${colunas}</div></div>
+      </section>
+      <section class="gm-os-history-panel" aria-label="Histórico de ordens concluídas">
+        <div class="gm-os-section-head"><div><h2>Histórico de OS concluídas</h2><p>Atendimentos encerrados continuam disponíveis para consulta.</p></div><span class="gm-os-total">${concluidas.length} concluídas</span></div>
+        <div class="gm-os-history-filters"><label class="gm-os-search-label">Buscar no histórico<input id="gm-os-history-search" type="search" placeholder="Cliente, veículo, placa ou serviço" value="${this._osEscape(this._osHistoricoBusca||'')}" oninput="window._garcia._buscarOSHistorico(this.value)"></label><label class="gm-os-month-label">Mês<select onchange="window._garcia.setOSMonthFilter(this.value)">${meses}</select></label></div>
+        <div class="gm-os-periods"><span>Período:</span>${periodos}</div>
+        <div class="gm-os-history-list">${historico.map(o=>`<div class="gm-os-history-item">${this._osCard(o,true)}</div>`).join('')}</div>
+        <p id="gm-os-history-empty" class="gm-os-history-empty" ${historico.length?'hidden':''}>Nenhuma OS concluída encontrada para este filtro.</p>
+      </section>
+    </div>`;
+    if(this._osHistoricoBusca)this._buscarOSHistorico(this._osHistoricoBusca);
+  }
+  _buscarOSHistorico(value){
+    this._osHistoricoBusca=value;
+    const query=String(value||'').toLocaleLowerCase('pt-BR').trim();
+    let shown=0;
+    document.querySelectorAll('.gm-os-history-item').forEach(item=>{
+      const match=!query||item.textContent.toLocaleLowerCase('pt-BR').includes(query);
+      item.hidden=!match;
+      if(match)shown++;
+    });
+    const empty=document.getElementById('gm-os-history-empty');
+    if(empty)empty.hidden=shown>0;
+  }
+  _clicarCardOS(id){
+    if(Date.now()<(this._osIgnorarCliqueAte||0))return;
+    this._abrirAtendimento(id);
+  }
+  _iniciarArrasteOS(event,id){
+    this._osArrastandoId=id;
+    event.dataTransfer.effectAllowed='move';
+    event.dataTransfer.setData('text/plain',String(id));
+    event.currentTarget.classList.add('gm-os-card-dragging');
+  }
+  _terminarArrasteOS(){
+    this._osArrastandoId=null;
+    document.querySelectorAll('.gm-os-card-dragging,.gm-os-stage-drop').forEach(el=>el.classList.remove('gm-os-card-dragging','gm-os-stage-drop'));
+  }
+  _sobreEtapaOS(event){
+    if(!this._osArrastandoId)return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect='move';
+    event.currentTarget.classList.add('gm-os-stage-drop');
+  }
+  _sairEtapaOS(event){
+    if(!event.currentTarget.contains(event.relatedTarget))event.currentTarget.classList.remove('gm-os-stage-drop');
+  }
+  async _soltarOSEtapa(event,status){
+    event.preventDefault();
+    const id=Number(event.dataTransfer.getData('text/plain')||this._osArrastandoId);
+    this._osIgnorarCliqueAte=Date.now()+350;
+    this._terminarArrasteOS();
+    if(Number.isSafeInteger(id))await this._moverOSEtapa(id,status);
+  }
+  async _moverOSEtapa(id,status,mostrarDetalhes=false){
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status==='Concluída'||!etapas.includes(status)||o.status===status)return false;
+    if(this._osMovendo){this._toast('Aguarde a atualização da etapa.',false);return false;}
+    this._osMovendo=true;
+    try{
+      const {data,error}=await this._db.from('ordens').update({status}).eq('id',id).select('id,status');
+      if(error||!data?.some(row=>row.id==id&&row.status===status))throw error||new Error('A etapa não foi confirmada no banco');
+      await this._load();
+      this._toast(`OS #${id} movida para ${status}.`);
+      if(mostrarDetalhes)setTimeout(()=>this._abrirAtendimento(id),0);
+      return true;
+    }catch(e){this._toast('Não foi possível mudar a etapa da OS.',false);return false;}
+    finally{this._osMovendo=false;}
+  }
+  _avancarOSEtapa(id,direcao){
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const o=this.state.ordens.find(x=>x.id==id);
+    const atual=etapas.indexOf(o?.status);
+    const proxima=atual+direcao;
+    if(proxima<0||proxima>=etapas.length)return false;
+    return this._moverOSEtapa(id,etapas[proxima],true);
+  }
+  _abrirAtendimento(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o)return;
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const esc=(value)=>this._osEscape(value);
+    const servico=this._parseSrv(o.servico);
+    const mecanico=this._parseMec(o.servico);
+    const clienteId=Number(c.id||o.cliente_id);
+    const clienteAction=Number.isFinite(clienteId)?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalHistoricoCliente(${clienteId})">Ver histórico completo do cliente</button>`:'';
+    const box=document.getElementById('modal-box');
+    if(box){box.style.maxWidth='680px';box.style.maxHeight='85vh';box.style.overflowY='auto';}
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const etapaAtual=etapas.indexOf(o.status);
+    const pago=o.status_pagamento==='Pago'&&Number(o.valor_pago||0)>=Number(o.valor||0);
+    this._openModal(`<div class="gm-os-detail">
+      <div class="gm-os-detail-head"><div><span class="gm-os-detail-number">OS #${esc(o.id)}</span><h2>${Number.isSafeInteger(clienteId)?`<button type="button" class="gm-os-client-link" onclick="window._garcia._modalHistoricoCliente(${clienteId})" aria-label="Abrir perfil de ${esc(c.nome||'cliente')}">${esc(c.nome||'Cliente não informado')} ↗</button>`:esc(c.nome||'Cliente não informado')}</h2><p>${esc(o.veiculo||'Veículo não informado')}${o.placa?' · '+esc(o.placa):''}</p></div><button type="button" class="gm-os-detail-close" onclick="window._garcia._closeModal()" aria-label="Fechar atendimento">×</button></div>
+      <div class="gm-os-detail-grid">
+        <div><span>Telefone</span><strong>${esc(c.telefone||'Não informado')}</strong></div>
+        <div><span>Email</span><strong>${esc(c.email||'Não informado')}</strong></div>
+        <div><span>Data da OS</span><strong>${esc(this._dfmt(o.data))}</strong></div>
+        <div><span>Status</span><strong>${esc(o.status||'Não informado')}</strong></div>
+        <div><span>Mecânico</span><strong>${esc(mecanico)}</strong></div>
+        <div><span>Placa</span><strong>${esc(o.placa||'Não informada')}</strong></div>
+        <div><span>Pagamento</span><strong>${esc(o.status_pagamento||'Não informado')}</strong></div>
+        <div><span>Valor pago</span><strong>${esc(this._fmt(o.valor_pago))}</strong></div>
+      </div>
+      <div class="gm-os-detail-section"><h3>Serviços</h3><p>${esc(servico)}</p></div>
+      ${c.id&&this._getObs(c.id)?`<div class="gm-os-detail-section"><h3>Observações do cliente</h3><p>${esc(this._getObs(c.id))}</p></div>`:''}
+      ${o.observacoes?`<div class="gm-os-detail-section"><h3>Observações da OS</h3><p>${esc(o.observacoes)}</p></div>`:''}
+      <div class="gm-os-detail-total"><span>Valor da OS</span><strong>${esc(this._fmt(o.valor))}</strong></div>
+      ${etapaAtual>=0?`<div class="gm-os-detail-actions gm-os-stage-actions"><button type="button" class="gm-os-action gm-os-action-secondary" ${etapaAtual===0?'disabled':''} onclick="window._garcia._avancarOSEtapa(${Number(o.id)},-1)">← Voltar etapa</button><button type="button" class="gm-os-action" ${etapaAtual===etapas.length-1?'disabled':''} onclick="window._garcia._avancarOSEtapa(${Number(o.id)},1)">Avançar etapa →</button></div>`:''}
+      <div class="gm-os-detail-actions">${clienteAction}<button type="button" class="gm-os-action" onclick="window._garcia._editarOS(${Number(o.id)})">Editar OS e status</button></div>
+      <div class="gm-os-detail-actions gm-os-detail-more">
+        <button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalOrcamento(${Number(o.id)})">Gerar orçamento</button>
+        ${!pago?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalPIX(${Number(o.id)})">Cobrar via PIX</button>`:''}
+        ${o.status==='Aguardando Pagamento'?`<button type="button" class="gm-os-action" onclick="window._garcia._modalPagamento(${Number(o.id)},true)">✓ Marcar como pago</button>`:o.status!=='Concluída'||!pago?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia.concluirOS(${Number(o.id)})">${o.status==='Concluída'?'Registrar pagamento restante':'Concluir OS'}</button>`:''}
+        ${o.status==='Concluída'&&pago?`<button type="button" class="gm-os-action" onclick="window._garcia._modalNotaOS(${Number(o.id)})">Nota da OS finalizada</button>`:''}
+        <button type="button" class="gm-os-action gm-os-action-danger" onclick="window._garcia.excluirOS(${Number(o.id)})">Excluir OS</button>
+      </div>
+    </div>`);
+  }
   setFilter(f){ this.setState({osFilter:f},()=>this._render()); }
   setOSPeriodFilter(f){ this.setState({osPeriodFilter:f},()=>this._render()); }
   setOSMonthFilter(f){ this.setState({osMonthFilter:f},()=>this._render()); }
@@ -3258,7 +3497,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     const recomPend=recomendacoesIA.filter(r=>!r.lida).length;
     const nFalhas=this._falhas().length;
     const na=(p)=>({s:`display:flex;align-items:center;gap:10px;padding:9px 12px;${page===p?'background:rgba(255,193,7,.08);border-radius:8px;border-left:3px solid #FFC107;':'border-radius:8px;'}cursor:pointer;`,t:`font-size:${page===p?'13':'12'}px;font-weight:${page===p?'700':'500'};color:${page===p?'#FFC107':'#777'};`});
-    const pages={dashboard:{title:'Dashboard',sub:'Visão geral da oficina',btn:'+ Nova OS',action:()=>this._modalOS()},os:{title:'Ordens de Serviço',sub:ordens.length+' registros',btn:'+ Nova OS',action:()=>this._modalOS()},clientes:{title:'Clientes',sub:clientes.length+' cadastrados',btn:'+ Novo Cliente',action:()=>this._modalCli()},receitas:{title:'Receitas',sub:'Faturamentos registrados',btn:'+ Nova Receita',action:()=>this._modalRec()},despesas:{title:'Despesas',sub:'Lançamentos do período',btn:'+ Nova Despesa',action:()=>this._modalDep()},financeiro:{title:'Financeiro',sub:'Análise financeira completa',btn:'+ Nova Despesa',action:()=>this._modalDep()},'financeiro-detalhes':{title:'Financeiro',sub:'Detalhes e rankings completos',btn:'',action:()=>{}},funcionarios:{title:'Funcionários',sub:this.state.funcionarios.length+' cadastrados',btn:'+ Novo Funcionário',action:()=>this._modalFunc()},configuracoes:{title:'Configurações',sub:'Ajustes e cadastros da plataforma',btn:'',action:()=>{}}};
+    const pages={dashboard:{title:'Dashboard',sub:'Visão geral da oficina',btn:'+ Nova OS',action:()=>this._modalOS()},os:{title:'Ordens de Serviço',sub:ordens.filter(o=>o.status!=='Concluída').length+' em atendimento',btn:'+ Nova OS',action:()=>this._modalOS()},clientes:{title:'Clientes',sub:clientes.length+' cadastrados',btn:'+ Novo Cliente',action:()=>this._modalCli()},receitas:{title:'Receitas',sub:'Faturamentos registrados',btn:'+ Nova Receita',action:()=>this._modalRec()},despesas:{title:'Despesas',sub:'Lançamentos do período',btn:'+ Nova Despesa',action:()=>this._modalDep()},financeiro:{title:'Financeiro',sub:'Análise financeira completa',btn:'+ Nova Despesa',action:()=>this._modalDep()},'financeiro-detalhes':{title:'Financeiro',sub:'Detalhes e rankings completos',btn:'',action:()=>{}},funcionarios:{title:'Funcionários',sub:this.state.funcionarios.length+' cadastrados',btn:'+ Novo Funcionário',action:()=>this._modalFunc()},configuracoes:{title:'Configurações',sub:'Ajustes e cadastros da plataforma',btn:'',action:()=>{}}};
     const pg=pages[page]||pages.dashboard;
     const osAb=ordens.filter(o=>o.status!=='Concluída').length;
     const ni=(svg,active)=>React.createElement('span',{dangerouslySetInnerHTML:{__html:svg},style:{display:'flex',alignItems:'center',justifyContent:'center',width:'16px',height:'16px',flexShrink:0,opacity:active?.9:.5}});

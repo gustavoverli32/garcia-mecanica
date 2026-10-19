@@ -69,56 +69,7 @@
     }
 
     else if(page==='os'){
-      const omf=osMonthFilter||curKey;
-      const period=this.state.osPeriodFilter||'todos';
-      const cutoffStr=(days)=>{const dt=new Date();dt.setDate(dt.getDate()-days);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
-      const hojeStr=cutoffStr(0);
-      const periodDays={hoje:0,semana:7,q15:15};
-      const monthScoped=period!=='todos'
-        ?ordens.filter(o=>(o.data||'')>=cutoffStr(periodDays[period])&&(o.data||'')<=hojeStr)
-        :ordens.filter(o=>o.status!=='Concluída'||this._mkey(o.data)===omf);
-      const filterMap={todos:null,ag:'Aguardando',and:'Em Andamento',peca:'Aguardando Peça',pag:'Aguardando Pagamento',conc:'Concluída'};
-      const filtered=filterMap[osFilter]?monthScoped.filter(o=>o.status===filterMap[osFilter]):monthScoped;
-      const monthOptsOS=this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===omf?'selected':''}>${m.label}</option>`).join('');
-      const rows=filtered.map(o=>`<tr style="border-bottom:1px solid #F9F9F9;">
-        <td style="${TD}color:#FFC107;font-weight:700;">#${o.id}</td>
-        <td style="${TD}font-weight:600;color:#374151;">${o.clientes?.nome||'—'}</td>
-        <td style="${TD}color:#9CA3AF;font-size:11px;">${o.veiculo||'—'}</td>
-        <td style="${TD}">${this._parseSrv(o.servico)}</td>
-        <td style="${TD}color:#6B7280;font-size:11px;font-weight:600;">${this._parseMec(o.servico)}</td>
-        <td style="${TD}color:#9CA3AF;font-size:11px;">${this._dfmt(o.data)}</td>
-        <td style="${TD}text-align:right;font-weight:700;">${this._fmt(o.valor)}</td>
-        <td style="padding:10px 16px;text-align:center;">
-          <span style="${this._stStyle(o.status)}">${o.status}</span>
-          ${o.status==='Concluída'&&o.status_pagamento&&o.status_pagamento!=='Pago'?`<div style="margin-top:4px;"><span style="background:#FEF2F2;color:#DC2626;font-size:8px;font-weight:700;padding:2px 7px;border-radius:20px;">${o.status_pagamento==='Parcial'?'Falta '+this._fmt((parseFloat(o.valor||0))-(parseFloat(o.valor_pago||0))):'Pendente'}</span></div>`:''}
-        </td>
-        <td style="padding:10px 16px;text-align:center;">
-          <button onclick="window._garcia._toggleAcoesMenu(${o.id},event)" style="background:#F3F4F6;border:none;border-radius:6px;width:30px;height:30px;font-size:15px;color:#374151;cursor:pointer;">⋮</button>
-          <div id="acoes-menu-${o.id}" style="display:none;position:fixed;background:#fff;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:9999;min-width:170px;overflow:hidden;text-align:left;">
-            <button onclick="window._garcia._editarOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">✏️ Editar OS</button>
-            <button onclick="window._garcia._modalOrcamento(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">📄 Gerar Orçamento</button>
-            <button onclick="window._garcia.concluirOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">${o.status==='Aguardando Pagamento'||(o.status==='Concluída'&&parseFloat(o.valor_pago||0)<parseFloat(o.valor||0))?'💰 Registrar Pagamento Restante':'✓ Concluir OS'}</button>
-            <button onclick="window._garcia._modalPIX(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:10px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">💠 Cobrar via PIX</button>
-            <button onclick="window._garcia.excluirOS(${o.id})" style="width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;border-top:1px solid #F3F4F6;padding:10px 14px;font-size:12px;font-weight:600;color:#DC2626;cursor:pointer;">✕ Excluir OS</button>
-          </div>
-        </td></tr>`).join('');
-      const fBtn=(k,l)=>`<button onclick="window._garcia.setFilter('${k}')" style="background:${osFilter===k?'#FFC107':'#fff'};border:${osFilter===k?'none':'1px solid #E5E7EB'};border-radius:20px;padding:6px 14px;font-size:11px;font-weight:${osFilter===k?'700':'500'};color:${osFilter===k?'#000':'#6B7280'};cursor:pointer;">${l}</button>`;
-      const pBtn=(k,l)=>`<button onclick="window._garcia.setOSPeriodFilter('${k}')" style="background:${period===k?'#1A1A1A':'#fff'};border:${period===k?'none':'1px solid #E5E7EB'};border-radius:20px;padding:6px 14px;font-size:11px;font-weight:${period===k?'700':'500'};color:${period===k?'#FFC107':'#6B7280'};cursor:pointer;">${l}</button>`;
-      el.innerHTML=`<div style="animation:fadeIn .25s ease;">
-        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-          ${fBtn('todos','Todos ('+monthScoped.length+')')}${fBtn('ag','Aguardando')}${fBtn('and','Em Andamento')}${fBtn('peca','Aguard. Peça')}${fBtn('pag','Aguard. Pagamento')}${fBtn('conc','Concluída')}
-          <span style="flex:1;"></span>
-          <span style="font-size:11px;color:#9CA3AF;font-weight:600;">Mês:</span>
-          <select onchange="window._garcia.setOSMonthFilter(this.value)" style="padding:8px 12px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer;">${monthOptsOS}</select>
-        </div>
-        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-          <span style="font-size:11px;color:#9CA3AF;font-weight:600;">Período:</span>
-          ${pBtn('todos','Todos')}${pBtn('hoje','Hoje')}${pBtn('semana','Últimos 7 dias')}${pBtn('q15','Últimos 15 dias')}
-        </div>
-        <div style="font-size:10px;color:#9CA3AF;margin:-8px 0 12px;">OS em aberto aparecem sempre; concluídas somem da lista no mês seguinte (ainda ficam no histórico do mês selecionado).</div>
-        <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);overflow:hidden;overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;min-width:900px;"><thead><tr style="background:#FAFAFA;"><th style="${TH}">OS#</th><th style="${TH}">Cliente</th><th style="${TH}">Veículo</th><th style="${TH}">Serviço(s)</th><th style="${TH}">Mecânico</th><th style="${TH}">Data</th><th style="${TH}text-align:right">Valor</th><th style="${TH}text-align:center">Status</th><th style="${TH}text-align:center">Ações</th></tr></thead><tbody>${rows||'<tr><td colspan="9" style="padding:24px;text-align:center;color:#9CA3AF;font-size:13px;">Nenhum registro encontrado</td></tr>'}</tbody></table>
-        </div></div>`;
+      this._renderOSFlow(el);
     }
 
     else if(page==='clientes'){

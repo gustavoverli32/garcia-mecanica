@@ -231,6 +231,174 @@
       setTimeout(()=>document.addEventListener('click',close),0);
     }
   }
+  _osEscape(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  _osCard(o,compact=false){
+    const esc=(value)=>this._osEscape(value);
+    const nome=o.clientes?.nome||this.state.clientes.find(c=>c.id==o.cliente_id)?.nome||'Cliente não informado';
+    const servico=this._parseSrv(o.servico);
+    return `<button type="button" class="gm-os-card${compact?' gm-os-card-history':''}" ${compact?'':`draggable="true" ondragstart="window._garcia._iniciarArrasteOS(event,${Number(o.id)})" ondragend="window._garcia._terminarArrasteOS()"`} onclick="window._garcia._clicarCardOS(${Number(o.id)})" aria-label="Abrir atendimento da OS ${Number(o.id)} de ${esc(nome)}">
+      <span class="gm-os-card-top"><strong>#${esc(o.id)}</strong><span>${esc(this._dfmt(o.data))}</span></span>
+      <span class="gm-os-card-vehicle">${esc(o.veiculo||'Veículo não informado')}</span>
+      ${o.placa?`<span class="gm-os-plate">${esc(o.placa)}</span>`:''}
+      <span class="gm-os-card-service">${esc(servico)}</span>
+      <span class="gm-os-card-bottom"><span>${esc(nome)}</span><strong>${esc(this._fmt(o.valor))}</strong></span>
+      ${compact?`<span class="gm-os-card-payment">${esc(o.status_pagamento||'Concluída')}</span>`:''}
+    </button>`;
+  }
+  _renderOSFlow(el){
+    const ordens=this.state.ordens||[];
+    const abertas=ordens.filter(o=>o.status!=='Concluída');
+    const concluidas=ordens.filter(o=>o.status==='Concluída');
+    const etapas=[
+      {status:'Aguardando',label:'Aguardando',color:'#818CF8'},
+      {status:'Em Andamento',label:'Em andamento',color:'#FFC107'},
+      {status:'Aguardando Peça',label:'Aguardando peça',color:'#FF8C00'},
+      {status:'Aguardando Pagamento',label:'Aguardando pagamento',color:'#EF4444'},
+    ];
+    const conhecidos=etapas.map(e=>e.status);
+    const mes=this.state.osMonthFilter||'all';
+    const periodo=this.state.osPeriodFilter||'todos';
+    const hoje=this._today();
+    const limite=(dias)=>{const d=new Date();d.setDate(d.getDate()-dias);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+    const dias={hoje:0,semana:7,q15:15};
+    const historico=concluidas.filter(o=>{
+      if(mes!=='all'&&this._mkey(o.data)!==mes)return false;
+      if(periodo!=='todos'&&((o.data||'')<limite(dias[periodo])||(o.data||'')>hoje))return false;
+      return true;
+    });
+    const colunas=etapas.map((etapa,index)=>{
+      const itens=abertas.filter(o=>o.status===etapa.status||(index===0&&!conhecidos.includes(o.status)));
+      return `<section class="gm-os-stage" aria-label="${etapa.label}" ondragover="window._garcia._sobreEtapaOS(event)" ondragleave="window._garcia._sairEtapaOS(event)" ondrop="window._garcia._soltarOSEtapa(event,'${etapa.status}')">
+        <div class="gm-os-stage-title"><span class="gm-os-stage-dot" style="background:${etapa.color}"></span><h3>${etapa.label}</h3><span class="gm-os-stage-count">${itens.length}</span></div>
+        <div class="gm-os-stage-list">${itens.length?itens.map(o=>this._osCard(o)).join(''):'<p class="gm-os-stage-empty">Nenhuma OS nesta etapa</p>'}</div>
+      </section>`;
+    }).join('');
+    const meses=`<option value="all" ${mes==='all'?'selected':''}>Todos os meses</option>`+this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===mes?'selected':''}>${m.label}</option>`).join('');
+    const periodos=[['todos','Todos'],['hoje','Hoje'],['semana','Últimos 7 dias'],['q15','Últimos 15 dias']].map(([key,label])=>`<button type="button" class="gm-os-period${periodo===key?' active':''}" aria-pressed="${periodo===key}" onclick="window._garcia.setOSPeriodFilter('${key}')">${label}</button>`).join('');
+    el.innerHTML=`<div class="gm-os-page" style="animation:fadeIn .25s ease;">
+      <section class="gm-os-flow-panel" aria-label="Fluxo de atendimento">
+        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div>
+        <div class="gm-os-flow-scroll"><div class="gm-os-flow">${colunas}</div></div>
+      </section>
+      <section class="gm-os-history-panel" aria-label="Histórico de ordens concluídas">
+        <div class="gm-os-section-head"><div><h2>Histórico de OS concluídas</h2><p>Atendimentos encerrados continuam disponíveis para consulta.</p></div><span class="gm-os-total">${concluidas.length} concluídas</span></div>
+        <div class="gm-os-history-filters"><label class="gm-os-search-label">Buscar no histórico<input id="gm-os-history-search" type="search" placeholder="Cliente, veículo, placa ou serviço" value="${this._osEscape(this._osHistoricoBusca||'')}" oninput="window._garcia._buscarOSHistorico(this.value)"></label><label class="gm-os-month-label">Mês<select onchange="window._garcia.setOSMonthFilter(this.value)">${meses}</select></label></div>
+        <div class="gm-os-periods"><span>Período:</span>${periodos}</div>
+        <div class="gm-os-history-list">${historico.map(o=>`<div class="gm-os-history-item">${this._osCard(o,true)}</div>`).join('')}</div>
+        <p id="gm-os-history-empty" class="gm-os-history-empty" ${historico.length?'hidden':''}>Nenhuma OS concluída encontrada para este filtro.</p>
+      </section>
+    </div>`;
+    if(this._osHistoricoBusca)this._buscarOSHistorico(this._osHistoricoBusca);
+  }
+  _buscarOSHistorico(value){
+    this._osHistoricoBusca=value;
+    const query=String(value||'').toLocaleLowerCase('pt-BR').trim();
+    let shown=0;
+    document.querySelectorAll('.gm-os-history-item').forEach(item=>{
+      const match=!query||item.textContent.toLocaleLowerCase('pt-BR').includes(query);
+      item.hidden=!match;
+      if(match)shown++;
+    });
+    const empty=document.getElementById('gm-os-history-empty');
+    if(empty)empty.hidden=shown>0;
+  }
+  _clicarCardOS(id){
+    if(Date.now()<(this._osIgnorarCliqueAte||0))return;
+    this._abrirAtendimento(id);
+  }
+  _iniciarArrasteOS(event,id){
+    this._osArrastandoId=id;
+    event.dataTransfer.effectAllowed='move';
+    event.dataTransfer.setData('text/plain',String(id));
+    event.currentTarget.classList.add('gm-os-card-dragging');
+  }
+  _terminarArrasteOS(){
+    this._osArrastandoId=null;
+    document.querySelectorAll('.gm-os-card-dragging,.gm-os-stage-drop').forEach(el=>el.classList.remove('gm-os-card-dragging','gm-os-stage-drop'));
+  }
+  _sobreEtapaOS(event){
+    if(!this._osArrastandoId)return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect='move';
+    event.currentTarget.classList.add('gm-os-stage-drop');
+  }
+  _sairEtapaOS(event){
+    if(!event.currentTarget.contains(event.relatedTarget))event.currentTarget.classList.remove('gm-os-stage-drop');
+  }
+  async _soltarOSEtapa(event,status){
+    event.preventDefault();
+    const id=Number(event.dataTransfer.getData('text/plain')||this._osArrastandoId);
+    this._osIgnorarCliqueAte=Date.now()+350;
+    this._terminarArrasteOS();
+    if(Number.isSafeInteger(id))await this._moverOSEtapa(id,status);
+  }
+  async _moverOSEtapa(id,status,mostrarDetalhes=false){
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o||o.status==='Concluída'||!etapas.includes(status)||o.status===status)return false;
+    if(this._osMovendo){this._toast('Aguarde a atualização da etapa.',false);return false;}
+    this._osMovendo=true;
+    try{
+      const {data,error}=await this._db.from('ordens').update({status}).eq('id',id).select('id,status');
+      if(error||!data?.some(row=>row.id==id&&row.status===status))throw error||new Error('A etapa não foi confirmada no banco');
+      await this._load();
+      this._toast(`OS #${id} movida para ${status}.`);
+      if(mostrarDetalhes)setTimeout(()=>this._abrirAtendimento(id),0);
+      return true;
+    }catch(e){this._toast('Não foi possível mudar a etapa da OS.',false);return false;}
+    finally{this._osMovendo=false;}
+  }
+  _avancarOSEtapa(id,direcao){
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const o=this.state.ordens.find(x=>x.id==id);
+    const atual=etapas.indexOf(o?.status);
+    const proxima=atual+direcao;
+    if(proxima<0||proxima>=etapas.length)return false;
+    return this._moverOSEtapa(id,etapas[proxima],true);
+  }
+  _abrirAtendimento(id){
+    const o=this.state.ordens.find(x=>x.id==id);
+    if(!o)return;
+    const c=this.state.clientes.find(x=>x.id==o.cliente_id)||o.clientes||{};
+    const esc=(value)=>this._osEscape(value);
+    const servico=this._parseSrv(o.servico);
+    const mecanico=this._parseMec(o.servico);
+    const clienteId=Number(c.id||o.cliente_id);
+    const clienteAction=Number.isFinite(clienteId)?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalHistoricoCliente(${clienteId})">Ver histórico completo do cliente</button>`:'';
+    const box=document.getElementById('modal-box');
+    if(box){box.style.maxWidth='680px';box.style.maxHeight='85vh';box.style.overflowY='auto';}
+    const etapas=['Aguardando','Em Andamento','Aguardando Peça','Aguardando Pagamento'];
+    const etapaAtual=etapas.indexOf(o.status);
+    const pago=o.status_pagamento==='Pago'&&Number(o.valor_pago||0)>=Number(o.valor||0);
+    this._openModal(`<div class="gm-os-detail">
+      <div class="gm-os-detail-head"><div><span class="gm-os-detail-number">OS #${esc(o.id)}</span><h2>${Number.isSafeInteger(clienteId)?`<button type="button" class="gm-os-client-link" onclick="window._garcia._modalHistoricoCliente(${clienteId})" aria-label="Abrir perfil de ${esc(c.nome||'cliente')}">${esc(c.nome||'Cliente não informado')} ↗</button>`:esc(c.nome||'Cliente não informado')}</h2><p>${esc(o.veiculo||'Veículo não informado')}${o.placa?' · '+esc(o.placa):''}</p></div><button type="button" class="gm-os-detail-close" onclick="window._garcia._closeModal()" aria-label="Fechar atendimento">×</button></div>
+      <div class="gm-os-detail-grid">
+        <div><span>Telefone</span><strong>${esc(c.telefone||'Não informado')}</strong></div>
+        <div><span>Email</span><strong>${esc(c.email||'Não informado')}</strong></div>
+        <div><span>Data da OS</span><strong>${esc(this._dfmt(o.data))}</strong></div>
+        <div><span>Status</span><strong>${esc(o.status||'Não informado')}</strong></div>
+        <div><span>Mecânico</span><strong>${esc(mecanico)}</strong></div>
+        <div><span>Placa</span><strong>${esc(o.placa||'Não informada')}</strong></div>
+        <div><span>Pagamento</span><strong>${esc(o.status_pagamento||'Não informado')}</strong></div>
+        <div><span>Valor pago</span><strong>${esc(this._fmt(o.valor_pago))}</strong></div>
+      </div>
+      <div class="gm-os-detail-section"><h3>Serviços</h3><p>${esc(servico)}</p></div>
+      ${c.id&&this._getObs(c.id)?`<div class="gm-os-detail-section"><h3>Observações do cliente</h3><p>${esc(this._getObs(c.id))}</p></div>`:''}
+      ${o.observacoes?`<div class="gm-os-detail-section"><h3>Observações da OS</h3><p>${esc(o.observacoes)}</p></div>`:''}
+      <div class="gm-os-detail-total"><span>Valor da OS</span><strong>${esc(this._fmt(o.valor))}</strong></div>
+      ${etapaAtual>=0?`<div class="gm-os-detail-actions gm-os-stage-actions"><button type="button" class="gm-os-action gm-os-action-secondary" ${etapaAtual===0?'disabled':''} onclick="window._garcia._avancarOSEtapa(${Number(o.id)},-1)">← Voltar etapa</button><button type="button" class="gm-os-action" ${etapaAtual===etapas.length-1?'disabled':''} onclick="window._garcia._avancarOSEtapa(${Number(o.id)},1)">Avançar etapa →</button></div>`:''}
+      <div class="gm-os-detail-actions">${clienteAction}<button type="button" class="gm-os-action" onclick="window._garcia._editarOS(${Number(o.id)})">Editar OS e status</button></div>
+      <div class="gm-os-detail-actions gm-os-detail-more">
+        <button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalOrcamento(${Number(o.id)})">Gerar orçamento</button>
+        ${!pago?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia._modalPIX(${Number(o.id)})">Cobrar via PIX</button>`:''}
+        ${o.status==='Aguardando Pagamento'?`<button type="button" class="gm-os-action" onclick="window._garcia._modalPagamento(${Number(o.id)},true)">✓ Marcar como pago</button>`:o.status!=='Concluída'||!pago?`<button type="button" class="gm-os-action gm-os-action-secondary" onclick="window._garcia.concluirOS(${Number(o.id)})">${o.status==='Concluída'?'Registrar pagamento restante':'Concluir OS'}</button>`:''}
+        ${o.status==='Concluída'&&pago?`<button type="button" class="gm-os-action" onclick="window._garcia._modalNotaOS(${Number(o.id)})">Nota da OS finalizada</button>`:''}
+        <button type="button" class="gm-os-action gm-os-action-danger" onclick="window._garcia.excluirOS(${Number(o.id)})">Excluir OS</button>
+      </div>
+    </div>`);
+  }
   setFilter(f){ this.setState({osFilter:f},()=>this._render()); }
   setOSPeriodFilter(f){ this.setState({osPeriodFilter:f},()=>this._render()); }
   setOSMonthFilter(f){ this.setState({osMonthFilter:f},()=>this._render()); }

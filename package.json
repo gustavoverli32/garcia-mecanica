@@ -12,7 +12,7 @@
     "check:original": "node scripts/build-original.mjs --check",
     "check:published": "node scripts/verify-published-bundle.mjs",
     "verify:readonly": "node scripts/assert-readonly.mjs",
-    "test": "node --test tests/contracts.test.mjs",
+    "test": "node --test tests/contracts.test.mjs tests/os-flow.test.mjs",
     "verify:env": "node scripts/verify-env-config.mjs",
     "dev": "node scripts/serve-original.mjs",
     "build": "node scripts/build-original.mjs",

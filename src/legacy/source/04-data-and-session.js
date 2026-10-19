@@ -113,6 +113,8 @@ class Component extends DCLogic {
 
   /* Lança automaticamente o salário de cada funcionário como despesa recorrente do mês (1x por mês) */
   async _autoSalarios(){
+    // O preview local consulta dados reais; nunca deve gerar despesas durante testes visuais.
+    if(['localhost','127.0.0.1'].includes(location.hostname))return;
     if(this._autoSalRunning)return; this._autoSalRunning=true;
     try{
       const {funcionarios,despesas}=this.state;

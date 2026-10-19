@@ -15,6 +15,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Test contracts and service-order flow
+        run: npm test
+      - name: Typecheck modular app
+        run: npm run typecheck
       - name: Verify original source against published bundle
         run: npm run check:original
       - name: Build original app
