@@ -496,7 +496,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
-      <button id="ai-rel-btn" sc-camel-on-click="{{ reportAI }}" title="Relatório de problemas e sugestões" style="background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);border-radius:6px;height:26px;padding:0 9px;cursor:pointer;color:#FFC107;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif;">Relatório</button>
+      <button id="ai-rel-btn" sc-camel-on-click="{{ reportAI }}" title="Área do administrador" style="background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);border-radius:6px;height:26px;padding:0 9px;cursor:pointer;color:#FFC107;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif;">🔒 Admin</button>
       <button sc-camel-on-click="{{ toggleAI }}" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;color:#fff;font-size:16px;">×</button>
     </div>
   </div>
@@ -3341,7 +3341,54 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     if(!p)return;
     const visible=p.style.display==='flex';
     p.style.display=visible?'none':'flex';
-    if(!visible) document.getElementById('ai-input')?.focus();
+    if(!visible){ document.getElementById('ai-input')?.focus(); this._adminBotao(); }
+  }
+
+  /* Admin: login próprio pelo Supabase Auth, em cliente separado (storageKey próprio) para não
+     trocar o papel das consultas do app. A leitura dos relatos é liberada pela RLS só para o admin. */
+  _adminDb(){
+    if(!this._admDb && window.supabase) this._admDb=window.supabase.createClient(this._URL,this._KEY,{auth:{storageKey:'g_admin_auth',persistSession:true}});
+    return this._admDb;
+  }
+
+  async _adminSessao(){
+    try{ const {data}=await this._adminDb().auth.getSession(); return data?.session||null; }catch(_){ return null; }
+  }
+
+  async _adminBotao(){
+    const b=document.getElementById('ai-rel-btn');
+    if(b) b.textContent=(await this._adminSessao())?'Relatório':'🔒 Admin';
+  }
+
+  async _adminSair(){
+    try{ await this._adminDb().auth.signOut(); }catch(_){}
+    this._adminBotao();
+    this._aiBubble('Você saiu do acesso de administrador.');
+  }
+
+  _adminLoginForm(){
+    const f=this._aiBubble(`<strong>🔒 Acesso do administrador</strong><br><span style="color:#6B7280;">Entre com o e-mail e a senha de admin para ver o relatório.</span>
+      <input id="adm-email" type="email" placeholder="E-mail" style="display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;">
+      <input id="adm-senha" type="password" placeholder="Senha" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;">
+      <div id="adm-err" style="color:#DC2626;font-size:11px;margin-top:6px;display:none;"></div>
+      <button id="adm-entrar" style="margin-top:8px;background:#1A1A1A;color:#FFC107;border:none;border-radius:6px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;">Entrar</button>`);
+    if(!f)return;
+    const entrar=async()=>{
+      const email=f.querySelector('#adm-email')?.value.trim();
+      const senha=f.querySelector('#adm-senha')?.value||'';
+      const err=f.querySelector('#adm-err');
+      const btn=f.querySelector('#adm-entrar');
+      if(!email||!senha){ err.textContent='Informe e-mail e senha.'; err.style.display='block'; return; }
+      btn.textContent='Entrando...'; btn.disabled=true;
+      const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
+      if(error){ err.textContent='E-mail ou senha inválidos.'; err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false; return; }
+      f.innerHTML='✅ Acesso de administrador liberado.';
+      this._adminBotao();
+      this._relatorioMelhorias();
+    };
+    f.querySelector('#adm-entrar')?.addEventListener('click',entrar);
+    f.querySelector('#adm-senha')?.addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
+    f.querySelector('#adm-email')?.focus();
   }
 
   _aiBubble(html,user=false){
@@ -3431,12 +3478,13 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
   }
 
   async _relatorioMelhorias(){
+    if(!(await this._adminSessao())){ this._adminLoginForm(); return; }
     const load=this._aiBubble('✦ Montando relatório de problemas e sugestões...');
     if(!load)return;
     load.style.color='#9CA3AF';
     let lista=[];
     try {
-      const {data,error}=await this._db.from('melhorias_plataforma').select('*').order('created_at',{ascending:false}).limit(200);
+      const {data,error}=await this._adminDb().from('melhorias_plataforma').select('*').order('created_at',{ascending:false}).limit(200);
       if(error) throw error;
       lista=data||[];
     } catch(e) { console.error('[melhorias] falha ao ler relatos',e); }
@@ -3460,8 +3508,10 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     load.innerHTML=`<strong>📊 Relatório de uso — melhorias da plataforma</strong><br>`+
       `<div style="margin:6px 0 4px;color:#6B7280;">${lista.length} relato(s): ${cont.problema} problema(s), ${cont.sugestao} sugestão(ões), ${cont.duvida} dificuldade(s)</div>`+
       itens+
-      `<button id="ai-rel-dl" style="margin-top:8px;background:#1A1A1A;color:#FFC107;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">Baixar relatório (.txt)</button>`;
-    document.getElementById('ai-rel-dl')?.addEventListener('click',()=>{
+      `<button id="ai-rel-dl" style="margin-top:8px;background:#1A1A1A;color:#FFC107;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">Baixar relatório (.txt)</button>`+
+      `<button id="ai-adm-sair" style="margin:8px 0 0 6px;background:none;color:#6B7280;border:1px solid #E5E7EB;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">Sair do admin</button>`;
+    load.querySelector('#ai-adm-sair')?.addEventListener('click',()=>this._adminSair());
+    load.querySelector('#ai-rel-dl')?.addEventListener('click',()=>{
       const txt=['RELATÓRIO DE MELHORIAS DA PLATAFORMA — GARCIA AUTO MECÂNICA','Gerado em '+fmt(new Date()),
         `${lista.length} relato(s): ${cont.problema} problema(s), ${cont.sugestao} sugestão(ões), ${cont.duvida} dificuldade(s)`,'',
         ...lista.map((r,i)=>`${i+1}. [${(rot[r.tipo]||'Sugestão').replace(/^\S+\s/,'')}] ${r.area||''} — ${fmt(r.created_at)} (tela: ${r.pagina||'-'})\n   Relato: ${r.relato}\n   Proposta: ${r.proposta||'-'}\n`)].join('\n');

@@ -1,6 +1,7 @@
 -- Tabela dos relatos do assistente de melhorias (botão flutuante).
 -- Rodar UMA vez no Supabase: Dashboard > SQL Editor > colar e executar.
--- O app (chave publishable/anon) só pode INSERIR e LER. Não pode alterar nem apagar.
+-- Qualquer usuário do app pode só INSERIR relatos. Só o administrador (usuário do Supabase Auth
+-- marcado com role "admin", passo 2 abaixo) pode LER. Ninguém pelo app pode alterar nem apagar.
 -- Para desfazer: veja o bloco "ROLLBACK" no final.
 
 create table if not exists public.melhorias_plataforma (
@@ -22,12 +23,19 @@ create policy "melhorias_insert" on public.melhorias_plataforma
   for insert to anon, authenticated
   with check (status = 'novo');
 
-drop policy if exists "melhorias_select" on public.melhorias_plataforma;
-create policy "melhorias_select" on public.melhorias_plataforma
-  for select to anon, authenticated
-  using (true);
+drop policy if exists "melhorias_select_admin" on public.melhorias_plataforma;
+create policy "melhorias_select_admin" on public.melhorias_plataforma
+  for select to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-grant insert, select on public.melhorias_plataforma to anon, authenticated;
+grant insert on public.melhorias_plataforma to anon, authenticated;
+grant select on public.melhorias_plataforma to authenticated;
 
--- ROLLBACK (apaga a tabela e todos os relatos):
+-- PASSO 2 (uma vez): crie seu usuário em Authentication > Users > "Add user" (e-mail + senha,
+-- marque "Auto Confirm User"). Depois troque o e-mail abaixo pelo seu e rode esta linha:
+-- update auth.users set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'
+--   where email = 'SEU_EMAIL_AQUI';
+-- (o papel "admin" fica em app_metadata, que o próprio usuário não consegue alterar.)
+
+-- ROLLBACK (apaga a tabela e todos os relatos; o usuário admin pode ser removido em Authentication > Users):
 -- drop table if exists public.melhorias_plataforma;
