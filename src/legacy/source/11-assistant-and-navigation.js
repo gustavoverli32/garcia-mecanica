@@ -134,7 +134,7 @@
       setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     });
     const msgs=document.getElementById('ai-msgs');
-    if(msgs) msgs.scrollTop=msgs.scrollHeight;
+    if(msgs) msgs.scrollTop=load.offsetTop-10;
   }
 
   async _analisarFinanceiro(){
