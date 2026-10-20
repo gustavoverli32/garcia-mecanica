@@ -6,44 +6,135 @@
     if(!visible) document.getElementById('ai-input')?.focus();
   }
 
+  _aiBubble(html,user=false){
+    const msgs=document.getElementById('ai-msgs');
+    if(!msgs)return null;
+    const b=document.createElement('div');
+    b.style.cssText=user
+      ?'background:#FFC107;border-radius:10px;padding:10px 14px;font-size:12px;color:#000;font-weight:600;align-self:flex-end;max-width:85%;margin-left:auto;'
+      :'background:#fff;border-radius:10px;padding:10px 14px;font-size:12px;color:#374151;box-shadow:0 1px 3px rgba(0,0,0,.06);max-width:90%;';
+    if(user) b.textContent=html; else b.innerHTML=html;
+    msgs.appendChild(b);
+    msgs.scrollTop=msgs.scrollHeight;
+    return b;
+  }
+
+  _esc(t){ return String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  async _perguntarIA(pergunta){
+    const resp=await fetch(this._URL+'/functions/v1/assistente-ia',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+this._KEY,'apikey':this._KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({pergunta})
+    });
+    const data=await resp.json();
+    if(!resp.ok||data.error) throw new Error(data.error||'Falha ao consultar a IA');
+    return data.resposta||'';
+  }
+
+  /* Assistente de melhorias: cada mensagem vira um relato (problema/sugestão/dúvida)
+     salvo em melhorias_plataforma, com uma proposta de melhoria gerada pela IA. */
   async _sendAI(){
     const inp=document.getElementById('ai-input');
-    const msgs=document.getElementById('ai-msgs');
-    if(!inp||!msgs)return;
+    if(!inp)return;
     const txt=inp.value.trim();
     if(!txt)return;
     inp.value='';
+    this._aiBubble(txt,true);
+    const load=this._aiBubble('✦ Registrando seu relato...');
+    if(load) load.style.color='#9CA3AF';
 
-    // Mensagem do usuário
-    const userBubble=document.createElement('div');
-    userBubble.style.cssText='background:#FFC107;border-radius:10px;padding:10px 14px;font-size:12px;color:#000;font-weight:600;align-self:flex-end;max-width:85%;margin-left:auto;';
-    userBubble.textContent=txt;
-    msgs.appendChild(userBubble);
-    msgs.scrollTop=msgs.scrollHeight;
-
-    // Loading
-    const loadBubble=document.createElement('div');
-    loadBubble.style.cssText='background:#fff;border-radius:10px;padding:10px 14px;font-size:12px;color:#9CA3AF;box-shadow:0 1px 3px rgba(0,0,0,.06);max-width:90%;';
-    loadBubble.textContent='✦ Pensando...';
-    msgs.appendChild(loadBubble);
-    msgs.scrollTop=msgs.scrollHeight;
+    const titulos={dashboard:'Dashboard',os:'Ordens de Serviço',clientes:'Clientes',receitas:'Receitas',despesas:'Despesas',financeiro:'Financeiro','financeiro-detalhes':'Financeiro',funcionarios:'Funcionários',configuracoes:'Configurações'};
+    const pagina=titulos[this.state.page]||this.state.page||'';
+    const reg={relato:txt.slice(0,4000),pagina,tipo:'sugestao',area:pagina,resumo:txt.slice(0,200),proposta:null};
 
     try {
-      const resp=await fetch(this._URL+'/functions/v1/assistente-ia',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+this._KEY,'apikey':this._KEY,'Content-Type':'application/json'},
-        body:JSON.stringify({pergunta:txt})
-      });
-      const data=await resp.json();
-      if(!resp.ok||data.error) throw new Error(data.error||'Falha ao consultar a IA');
-      loadBubble.style.color='#374151';
-      loadBubble.innerHTML=(data.resposta||'').replace(/\n/g,'<br>');
+      const resposta=await this._perguntarIA(
+        'Você agora atua como analista de melhorias do sistema de gestão da Garcia Auto Mecânica '+
+        '(telas: Dashboard, Ordens de Serviço, Clientes, Receitas, Despesas, Financeiro, Funcionários, Configurações). '+
+        'Um usuário do sistema escreveu o relato abaixo enquanto estava na tela "'+pagina+'". '+
+        'Classifique e proponha uma melhoria concreta para a plataforma que resolva o problema ou atenda a sugestão. '+
+        'Responda SOMENTE com um JSON válido, sem nenhum texto antes ou depois, no formato: '+
+        '{"tipo":"problema|sugestao|duvida","area":"tela ou funcionalidade afetada","resumo":"uma frase curta","proposta":"proposta de melhoria em até 3 frases"}\n\n'+
+        'Relato do usuário: """'+txt+'"""'
+      );
+      const m=resposta.match(/\{[\s\S]*\}/);
+      const j=m?JSON.parse(m[0]):null;
+      if(j){
+        const tipo=String(j.tipo||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+        if(['problema','sugestao','duvida'].includes(tipo)) reg.tipo=tipo;
+        if(j.area) reg.area=String(j.area).slice(0,120);
+        if(j.resumo) reg.resumo=String(j.resumo).slice(0,300);
+        if(j.proposta) reg.proposta=String(j.proposta).slice(0,2000);
+      } else if(resposta) reg.proposta=resposta.slice(0,2000);
+    } catch(e) { console.error('[melhorias] IA indisponível, relato salvo sem proposta',e); }
+
+    let salvo=false;
+    try {
+      const {error}=await this._db.from('melhorias_plataforma').insert(reg);
+      if(error) throw error;
+      salvo=true;
     } catch(e) {
-      console.error(e);
-      loadBubble.style.color='#DC2626';
-      loadBubble.textContent='Erro ao conectar com a IA. Tente novamente.';
+      try{ const l=JSON.parse(localStorage.getItem('g_melhorias')||'[]'); l.push({...reg,created_at:new Date().toISOString()}); localStorage.setItem('g_melhorias',JSON.stringify(l.slice(-100))); }catch(_){}
+      this._falhaNuvem('Relato de melhoria',e);
     }
-    msgs.scrollTop=msgs.scrollHeight;
+
+    const rot={problema:'⚠️ Problema',sugestao:'💡 Sugestão',duvida:'❓ Dificuldade'};
+    if(load){
+      load.style.color='#374151';
+      load.innerHTML=`<strong>${salvo?'✅ Relato registrado!':'⚠ Relato guardado neste aparelho'}</strong><br><br>`+
+        `<span style="color:#6B7280;">Tipo:</span> ${rot[reg.tipo]}<br>`+
+        `<span style="color:#6B7280;">Área:</span> ${this._esc(reg.area)}<br>`+
+        `<span style="color:#6B7280;">Resumo:</span> ${this._esc(reg.resumo)}<br><br>`+
+        `Obrigado! A equipe vai analisar. Se quiser, conte mais detalhes ou registre outro relato.`;
+    }
+    const msgs=document.getElementById('ai-msgs');
+    if(msgs) msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  async _relatorioMelhorias(){
+    const load=this._aiBubble('✦ Montando relatório de problemas e sugestões...');
+    if(!load)return;
+    load.style.color='#9CA3AF';
+    let lista=[];
+    try {
+      const {data,error}=await this._db.from('melhorias_plataforma').select('*').order('created_at',{ascending:false}).limit(200);
+      if(error) throw error;
+      lista=data||[];
+    } catch(e) { console.error('[melhorias] falha ao ler relatos',e); }
+    let locais=[];
+    try{ locais=JSON.parse(localStorage.getItem('g_melhorias')||'[]').map(x=>({...x,_local:true})); }catch(_){}
+    lista=[...locais,...lista];
+    load.style.color='#374151';
+    if(!lista.length){ load.innerHTML='Ainda não há relatos registrados.'; return; }
+
+    const rot={problema:'⚠️ Problema',sugestao:'💡 Sugestão',duvida:'❓ Dificuldade'};
+    const cont={problema:0,sugestao:0,duvida:0};
+    lista.forEach(r=>{ cont[r.tipo]=(cont[r.tipo]||0)+1; });
+    const fmt=(d)=>{ try{ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(_){ return ''; } };
+    const itens=lista.map(r=>`
+      <div style="border-top:1px solid #F3F4F6;padding:8px 0;">
+        <div style="font-size:10px;color:#9CA3AF;">${fmt(r.created_at)} · ${this._esc(r.pagina||'')}${r._local?' · só neste aparelho':''}</div>
+        <div style="font-weight:700;margin:2px 0;">${rot[r.tipo]||'💡 Sugestão'} — ${this._esc(r.area||'')}</div>
+        <div><span style="color:#6B7280;">Relato:</span> ${this._esc(r.relato)}</div>
+        <div style="margin-top:3px;"><span style="color:#6B7280;">Proposta:</span> ${r.proposta?this._esc(r.proposta):'<em style="color:#9CA3AF;">sem proposta gerada</em>'}</div>
+      </div>`).join('');
+    load.innerHTML=`<strong>📊 Relatório de uso — melhorias da plataforma</strong><br>`+
+      `<div style="margin:6px 0 4px;color:#6B7280;">${lista.length} relato(s): ${cont.problema} problema(s), ${cont.sugestao} sugestão(ões), ${cont.duvida} dificuldade(s)</div>`+
+      itens+
+      `<button id="ai-rel-dl" style="margin-top:8px;background:#1A1A1A;color:#FFC107;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">Baixar relatório (.txt)</button>`;
+    document.getElementById('ai-rel-dl')?.addEventListener('click',()=>{
+      const txt=['RELATÓRIO DE MELHORIAS DA PLATAFORMA — GARCIA AUTO MECÂNICA','Gerado em '+fmt(new Date()),
+        `${lista.length} relato(s): ${cont.problema} problema(s), ${cont.sugestao} sugestão(ões), ${cont.duvida} dificuldade(s)`,'',
+        ...lista.map((r,i)=>`${i+1}. [${(rot[r.tipo]||'Sugestão').replace(/^\S+\s/,'')}] ${r.area||''} — ${fmt(r.created_at)} (tela: ${r.pagina||'-'})\n   Relato: ${r.relato}\n   Proposta: ${r.proposta||'-'}\n`)].join('\n');
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+      a.download='relatorio-melhorias-garcia.txt';
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    });
+    const msgs=document.getElementById('ai-msgs');
+    if(msgs) msgs.scrollTop=msgs.scrollHeight;
   }
 
   async _analisarFinanceiro(){
@@ -203,6 +294,7 @@
       closeSidebar:()=>this._toggleSidebar(false),
       toggleAI:()=>this._toggleAI(),
       sendAI:()=>this._sendAI(),
+      reportAI:()=>this._relatorioMelhorias(),
       aiInputKeyDown:(e)=>{ if(e.key==='Enter') this._sendAI(); },
     };
   }
