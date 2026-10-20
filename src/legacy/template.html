@@ -3472,7 +3472,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
       setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     });
     const msgs=document.getElementById('ai-msgs');
-    if(msgs) msgs.scrollTop=load.offsetTop-10;
+    if(msgs) msgs.scrollTop=load.offsetTop-msgs.offsetTop-10;
   }
 
   async _analisarFinanceiro(){
