@@ -158,8 +158,39 @@ class Component extends DCLogic {
 
   loginEnter = (e) => { if(e.key==='Enter') this.doLogin(); };
 
+  /* Acesso administrador: login do Supabase Auth (ver _adminDb). Entra no app e abre o relatório de melhorias. */
+  adminToggle = () => {
+    const b=document.getElementById('adm-login-box');
+    if(!b)return;
+    b.style.display=b.style.display==='block'?'none':'block';
+    if(b.style.display==='block') document.getElementById('adm-login-email')?.focus();
+  };
+
+  adminLogin = async () => {
+    const email=(document.getElementById('adm-login-email')?.value||'').trim();
+    const senha=document.getElementById('adm-login-senha')?.value||'';
+    const err=document.getElementById('adm-login-err');
+    const btn=document.getElementById('adm-login-btn');
+    const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO ADMIN'; btn.disabled=false; } };
+    if(!email||!senha) return erro('Informe e-mail e senha do administrador.');
+    if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
+    try {
+      await this._waitForSupabase();
+      const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
+      if(error) return erro('E-mail ou senha de administrador inválidos.');
+    } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
+    localStorage.setItem('g_sess','1');
+    this.setState({ loggedIn:true, loginErr:'' }, () => {
+      this._init();
+      setTimeout(()=>{ const p=document.getElementById('ai-panel'); if(p&&p.style.display!=='flex') this._toggleAI(); this._relatorioMelhorias(); },300);
+    });
+  };
+
+  adminEnter = (e) => { if(e.key==='Enter') this.adminLogin(); };
+
   logout = () => {
     localStorage.removeItem('g_sess');
+    try{ this._admDb?.auth.signOut(); }catch(_){}
     this.setState({ loggedIn:false, loginErr:'', page:'dashboard' });
   };
 

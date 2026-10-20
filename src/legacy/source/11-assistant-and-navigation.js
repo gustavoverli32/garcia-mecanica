@@ -19,7 +19,7 @@
 
   async _adminBotao(){
     const b=document.getElementById('ai-rel-btn');
-    if(b) b.textContent=(await this._adminSessao())?'Relatório':'🔒 Admin';
+    if(b) b.style.display=(await this._adminSessao())?'block':'none';
   }
 
   async _adminSair(){
@@ -333,6 +333,7 @@
     return {
       notLoggedIn:!loggedIn, isLoggedIn:loggedIn,
       showErr:!!loginErr, loginErr, doLogin:this.doLogin, loginEnter:this.loginEnter,
+      adminToggle:this.adminToggle, adminLogin:this.adminLogin, adminEnter:this.adminEnter,
       logout:this.logout,
       navItems,
       connStyle:`font-size:9px;font-weight:700;color:${nFalhas?'#F59E0B':(connected?'#10B981':'#9CA3AF')};${nFalhas?'cursor:pointer;':''}`,

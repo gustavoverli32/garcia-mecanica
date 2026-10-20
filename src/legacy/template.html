@@ -424,6 +424,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
     </sc-if>
     <button sc-camel-on-click="{{ doLogin }}" style="width:100%;padding:13px;background:#FFC107;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#000;cursor:pointer;letter-spacing:1px;">ENTRAR</button>
     <div style="text-align:center;margin-top:18px;font-size:10px;color:#C4C4C4;">Garcia Auto Mecânica · Campos dos Goytacazes RJ</div>
+    <div style="text-align:center;margin-top:10px;">
+      <button sc-camel-on-click="{{ adminToggle }}" style="background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;color:#9CA3AF;font-family:'Montserrat',sans-serif;">🔒 Acesso administrador</button>
+    </div>
+    <div id="adm-login-box" style="display:none;margin-top:10px;padding-top:14px;border-top:1px solid #F3F4F6;">
+      <input id="adm-login-email" type="email" placeholder="E-mail do administrador" style="width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:13px;margin-bottom:8px;">
+      <input id="adm-login-senha" type="password" placeholder="Senha do administrador" sc-camel-on-key-down="{{ adminEnter }}" style="width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:13px;margin-bottom:8px;">
+      <div id="adm-login-err" style="display:none;background:#FEF2F2;color:#DC2626;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:8px;border-left:3px solid #DC2626;"></div>
+      <button id="adm-login-btn" sc-camel-on-click="{{ adminLogin }}" style="width:100%;padding:10px;background:#1A1A1A;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#FFC107;cursor:pointer;letter-spacing:1px;">ENTRAR COMO ADMIN</button>
+    </div>
   </div>
 </div>
 </sc-if>
@@ -496,7 +505,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
-      <button id="ai-rel-btn" sc-camel-on-click="{{ reportAI }}" title="Área do administrador" style="background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);border-radius:6px;height:26px;padding:0 9px;cursor:pointer;color:#FFC107;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif;">🔒 Admin</button>
+      <button id="ai-rel-btn" sc-camel-on-click="{{ reportAI }}" title="Relatório de problemas e sugestões (admin)" style="display:none;background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);border-radius:6px;height:26px;padding:0 9px;cursor:pointer;color:#FFC107;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif;">Relatório</button>
       <button sc-camel-on-click="{{ toggleAI }}" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;color:#fff;font-size:16px;">×</button>
     </div>
   </div>
@@ -681,8 +690,39 @@ class Component extends DCLogic {
 
   loginEnter = (e) => { if(e.key==='Enter') this.doLogin(); };
 
+  /* Acesso administrador: login do Supabase Auth (ver _adminDb). Entra no app e abre o relatório de melhorias. */
+  adminToggle = () => {
+    const b=document.getElementById('adm-login-box');
+    if(!b)return;
+    b.style.display=b.style.display==='block'?'none':'block';
+    if(b.style.display==='block') document.getElementById('adm-login-email')?.focus();
+  };
+
+  adminLogin = async () => {
+    const email=(document.getElementById('adm-login-email')?.value||'').trim();
+    const senha=document.getElementById('adm-login-senha')?.value||'';
+    const err=document.getElementById('adm-login-err');
+    const btn=document.getElementById('adm-login-btn');
+    const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO ADMIN'; btn.disabled=false; } };
+    if(!email||!senha) return erro('Informe e-mail e senha do administrador.');
+    if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
+    try {
+      await this._waitForSupabase();
+      const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
+      if(error) return erro('E-mail ou senha de administrador inválidos.');
+    } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
+    localStorage.setItem('g_sess','1');
+    this.setState({ loggedIn:true, loginErr:'' }, () => {
+      this._init();
+      setTimeout(()=>{ const p=document.getElementById('ai-panel'); if(p&&p.style.display!=='flex') this._toggleAI(); this._relatorioMelhorias(); },300);
+    });
+  };
+
+  adminEnter = (e) => { if(e.key==='Enter') this.adminLogin(); };
+
   logout = () => {
     localStorage.removeItem('g_sess');
+    try{ this._admDb?.auth.signOut(); }catch(_){}
     this.setState({ loggedIn:false, loginErr:'', page:'dashboard' });
   };
 
@@ -3357,7 +3397,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
 
   async _adminBotao(){
     const b=document.getElementById('ai-rel-btn');
-    if(b) b.textContent=(await this._adminSessao())?'Relatório':'🔒 Admin';
+    if(b) b.style.display=(await this._adminSessao())?'block':'none';
   }
 
   async _adminSair(){
@@ -3671,6 +3711,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     return {
       notLoggedIn:!loggedIn, isLoggedIn:loggedIn,
       showErr:!!loginErr, loginErr, doLogin:this.doLogin, loginEnter:this.loginEnter,
+      adminToggle:this.adminToggle, adminLogin:this.adminLogin, adminEnter:this.adminEnter,
       logout:this.logout,
       navItems,
       connStyle:`font-size:9px;font-weight:700;color:${nFalhas?'#F59E0B':(connected?'#10B981':'#9CA3AF')};${nFalhas?'cursor:pointer;':''}`,
