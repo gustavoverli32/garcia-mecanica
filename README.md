@@ -62,6 +62,11 @@ sobrescrever as partes editáveis. O controle de versão guarda o bundle anterio
 O protótipo em `src/app/` usa Next.js, mas não corresponde ao sistema atual e não
 participa do preview padrão nem do build da aplicação usada pelo cliente.
 
+## Testar sem mexer nos dados reais
+
+Rode `npm run demo` e abra http://localhost:3100/. A aplicação abre igual, com dados
+fictícios e todas as gravações bloqueadas. Passo a passo em [docs/MODO-DEMO.md](docs/MODO-DEMO.md).
+
 ## Documentação
 
 - [Cronograma](CRONOGRAMA.md)

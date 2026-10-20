@@ -1,13 +1,15 @@
 
 class Component extends DCLogic {
   _PWD = '123456';
+  /* Usuário do Supabase Auth do desenvolvedor: a tela pede só a senha. */
+  _ADMIN_EMAIL = 'dev@garcia-mecanica.app';
   _CAR_IMG = 'data:image/png;base64,__GARCIA_CAR_IMAGE_BASE64__';
   _URL = 'https://qjdvrqlcblkynheitkuk.supabase.co';
   _KEY = 'sb_publishable_WtViyZbjpmkjxjP5MFB3mw_-qCQwEXf';
   _db = null;
 
   state = {
-    loggedIn: false, loginErr: '', page: 'dashboard',
+    loggedIn: false, loginErr: '', page: 'dashboard', devMode: false,
     ordens: [], clientes: [], faturamentos: [], despesas: [], funcionarios: [], recomendacoesIA: [], agendamentos: [], servicos: [],
     connected: false, osFilter: 'todos', osMonthFilter: '', osPeriodFilter: 'todos', recFilter: '', depFilter: '',
   };
@@ -35,6 +37,7 @@ class Component extends DCLogic {
     try {
       await this._waitForSupabase();
       this._db = window.supabase.createClient(this._URL, this._KEY);
+      if(!this._acessoReg){ this._acessoReg=true; this._adminBotao(); setTimeout(()=>this._registrarAcesso('abertura',this.state.page),1200); }
       await this._load();
     } catch(e) {
       console.error(e);
@@ -158,9 +161,38 @@ class Component extends DCLogic {
 
   loginEnter = (e) => { if(e.key==='Enter') this.doLogin(); };
 
+  /* Acesso administrador: login do Supabase Auth (ver _adminDb). Entra no app e abre o relatório de melhorias. */
+  adminToggle = () => {
+    const b=document.getElementById('adm-login-box');
+    if(!b)return;
+    b.style.display=b.style.display==='block'?'none':'block';
+    if(b.style.display==='block') document.getElementById('adm-login-senha')?.focus();
+  };
+
+  adminLogin = async () => {
+    const senha=document.getElementById('adm-login-senha')?.value||'';
+    const err=document.getElementById('adm-login-err');
+    const btn=document.getElementById('adm-login-btn');
+    const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO DESENVOLVEDOR'; btn.disabled=false; } };
+    if(!senha) return erro('Informe a senha.');
+    if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
+    try {
+      await this._waitForSupabase();
+      const {error}=await this._adminDb().auth.signInWithPassword({email:this._ADMIN_EMAIL,password:senha});
+      if(error) return erro('Senha inválida.');
+    } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
+    localStorage.setItem('g_sess','1');
+    this._devData=null;
+    this.setState({ loggedIn:true, loginErr:'', devMode:true, page:'dev' }, () => this._init());
+  };
+
+  adminEnter = (e) => { if(e.key==='Enter') this.adminLogin(); };
+
   logout = () => {
     localStorage.removeItem('g_sess');
-    this.setState({ loggedIn:false, loginErr:'', page:'dashboard' });
+    try{ this._admDb?.auth.signOut(); }catch(_){}
+    this._acessoReg=false; this._ultimaTela=null; this._devData=null;
+    this.setState({ loggedIn:false, loginErr:'', page:'dashboard', devMode:false });
   };
 
   _nav(p){ return ()=>{ this.setState({page:p},()=>this._render()); }; }
