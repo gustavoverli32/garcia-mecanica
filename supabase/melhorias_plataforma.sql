@@ -31,10 +31,11 @@ create policy "melhorias_select_admin" on public.melhorias_plataforma
 grant insert on public.melhorias_plataforma to anon, authenticated;
 grant select on public.melhorias_plataforma to authenticated;
 
--- PASSO 2 (uma vez): crie seu usuário em Authentication > Users > "Add user" (e-mail + senha,
--- marque "Auto Confirm User"). Depois troque o e-mail abaixo pelo seu e rode esta linha:
+-- PASSO 2 (uma vez): em Authentication > Users > "Add user", crie o usuário com o e-mail
+-- dev@garcia-mecanica.app (não precisa existir de verdade; é o _ADMIN_EMAIL do app) e a senha de
+-- desenvolvedor (mínimo 6 caracteres), marcando "Auto Confirm User". Depois rode esta linha:
 -- update auth.users set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'
---   where email = 'SEU_EMAIL_AQUI';
+--   where email = 'dev@garcia-mecanica.app';
 -- (o papel "admin" fica em app_metadata, que o próprio usuário não consegue alterar.)
 
 -- ROLLBACK (apaga a tabela e todos os relatos; o usuário admin pode ser removido em Authentication > Users):

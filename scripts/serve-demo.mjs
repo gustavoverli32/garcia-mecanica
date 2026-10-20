@@ -177,7 +177,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const html = await buildDemoHtml();
   createDemoServer(html).listen(port, '127.0.0.1', () => {
     console.log(`\nModo demonstração da Garcia: http://localhost:${port}/`);
-    console.log('Senha de acesso: a mesma do sistema. Desenvolvedor (ícone no canto do login): senha DEV (e-mail opcional).');
+    console.log('Senha de acesso: a mesma do sistema. Desenvolvedor (ícone no canto do login): senha DEV.');
     console.log('Dados fictícios; nenhuma gravação chega ao Supabase. Relatos do assistente ficam só na memória.\n');
   });
 }

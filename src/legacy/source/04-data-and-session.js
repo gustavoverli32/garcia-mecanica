@@ -1,6 +1,8 @@
 
 class Component extends DCLogic {
   _PWD = '123456';
+  /* Usuário do Supabase Auth do desenvolvedor: a tela pede só a senha. */
+  _ADMIN_EMAIL = 'dev@garcia-mecanica.app';
   _CAR_IMG = 'data:image/png;base64,__GARCIA_CAR_IMAGE_BASE64__';
   _URL = 'https://qjdvrqlcblkynheitkuk.supabase.co';
   _KEY = 'sb_publishable_WtViyZbjpmkjxjP5MFB3mw_-qCQwEXf';
@@ -163,11 +165,10 @@ class Component extends DCLogic {
     const b=document.getElementById('adm-login-box');
     if(!b)return;
     b.style.display=b.style.display==='block'?'none':'block';
-    if(b.style.display==='block') document.getElementById('adm-login-email')?.focus();
+    if(b.style.display==='block') document.getElementById('adm-login-senha')?.focus();
   };
 
   adminLogin = async () => {
-    const email=(document.getElementById('adm-login-email')?.value||'').trim();
     const senha=document.getElementById('adm-login-senha')?.value||'';
     const err=document.getElementById('adm-login-err');
     const btn=document.getElementById('adm-login-btn');
@@ -176,8 +177,8 @@ class Component extends DCLogic {
     if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
     try {
       await this._waitForSupabase();
-      const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
-      if(error) return erro('E-mail ou senha inválidos.');
+      const {error}=await this._adminDb().auth.signInWithPassword({email:this._ADMIN_EMAIL,password:senha});
+      if(error) return erro('Senha inválida.');
     } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
     localStorage.setItem('g_sess','1');
     this.setState({ loggedIn:true, loginErr:'' }, () => {

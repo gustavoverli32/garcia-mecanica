@@ -29,28 +29,26 @@
   }
 
   _adminLoginForm(){
-    const f=this._aiBubble(`<strong>🔒 Acesso do administrador</strong><br><span style="color:#6B7280;">Entre com o e-mail e a senha de admin para ver o relatório.</span>
-      <input id="adm-email" type="email" placeholder="E-mail" style="display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;">
+    const f=this._aiBubble(`<strong>🔒 Acesso do administrador</strong><br><span style="color:#6B7280;">Digite a senha de desenvolvedor para ver o relatório.</span>
       <input id="adm-senha" type="password" placeholder="Senha" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;">
       <div id="adm-err" style="color:#DC2626;font-size:11px;margin-top:6px;display:none;"></div>
       <button id="adm-entrar" style="margin-top:8px;background:#1A1A1A;color:#FFC107;border:none;border-radius:6px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;">Entrar</button>`);
     if(!f)return;
     const entrar=async()=>{
-      const email=f.querySelector('#adm-email')?.value.trim();
       const senha=f.querySelector('#adm-senha')?.value||'';
       const err=f.querySelector('#adm-err');
       const btn=f.querySelector('#adm-entrar');
       if(!senha){ err.textContent='Informe a senha.'; err.style.display='block'; return; }
       btn.textContent='Entrando...'; btn.disabled=true;
-      const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
-      if(error){ err.textContent='E-mail ou senha inválidos.'; err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false; return; }
+      const {error}=await this._adminDb().auth.signInWithPassword({email:this._ADMIN_EMAIL,password:senha});
+      if(error){ err.textContent='Senha inválida.'; err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false; return; }
       f.innerHTML='✅ Acesso de administrador liberado.';
       this._adminBotao();
       this._relatorioMelhorias();
     };
     f.querySelector('#adm-entrar')?.addEventListener('click',entrar);
     f.querySelector('#adm-senha')?.addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
-    f.querySelector('#adm-email')?.focus();
+    f.querySelector('#adm-senha')?.focus();
   }
 
   _aiBubble(html,user=false){
