@@ -9,7 +9,7 @@ class Component extends DCLogic {
   _db = null;
 
   state = {
-    loggedIn: false, loginErr: '', page: 'dashboard',
+    loggedIn: false, loginErr: '', page: 'dashboard', devMode: false,
     ordens: [], clientes: [], faturamentos: [], despesas: [], funcionarios: [], recomendacoesIA: [], agendamentos: [], servicos: [],
     connected: false, osFilter: 'todos', osMonthFilter: '', osPeriodFilter: 'todos', recFilter: '', depFilter: '',
   };
@@ -37,6 +37,7 @@ class Component extends DCLogic {
     try {
       await this._waitForSupabase();
       this._db = window.supabase.createClient(this._URL, this._KEY);
+      if(!this._acessoReg){ this._acessoReg=true; this._adminBotao(); setTimeout(()=>this._registrarAcesso('abertura',this.state.page),1200); }
       await this._load();
     } catch(e) {
       console.error(e);
@@ -181,10 +182,8 @@ class Component extends DCLogic {
       if(error) return erro('Senha inválida.');
     } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
     localStorage.setItem('g_sess','1');
-    this.setState({ loggedIn:true, loginErr:'' }, () => {
-      this._init();
-      setTimeout(()=>{ const p=document.getElementById('ai-panel'); if(p&&p.style.display!=='flex') this._toggleAI(); this._relatorioMelhorias(); },300);
-    });
+    this._devData=null;
+    this.setState({ loggedIn:true, loginErr:'', devMode:true, page:'dev' }, () => this._init());
   };
 
   adminEnter = (e) => { if(e.key==='Enter') this.adminLogin(); };
@@ -192,7 +191,8 @@ class Component extends DCLogic {
   logout = () => {
     localStorage.removeItem('g_sess');
     try{ this._admDb?.auth.signOut(); }catch(_){}
-    this.setState({ loggedIn:false, loginErr:'', page:'dashboard' });
+    this._acessoReg=false; this._ultimaTela=null; this._devData=null;
+    this.setState({ loggedIn:false, loginErr:'', page:'dashboard', devMode:false });
   };
 
   _nav(p){ return ()=>{ this.setState({page:p},()=>this._render()); }; }

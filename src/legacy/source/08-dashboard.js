@@ -20,6 +20,8 @@
     const el=document.getElementById('main-content');
     if(!el)return;
     const {page,ordens,clientes,faturamentos,despesas,osFilter,osMonthFilter}=this.state;
+    if(this.state.loggedIn && page!==this._ultimaTela){ this._ultimaTela=page; this._registrarAcesso('tela',page); }
+    if(page==='dev'){ this._renderDev(el); return; }
     const now=new Date();
     const curKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
     const fatM=faturamentos.filter(f=>this._mkey(f.data)===curKey);

@@ -110,15 +110,17 @@ async function handleApi(request, response, url) {
     return;
   }
   const isAdmin = String(request.headers.authorization ?? '').includes(DEMO_ADMIN_TOKEN);
-  if (path === '/rest/v1/melhorias_plataforma') {
+  const tabelaDev = path.match(/^\/rest\/v1\/(melhorias_plataforma|acessos_plataforma)$/)?.[1];
+  if (tabelaDev) {
     if (request.method === 'POST') {
       const row = await readBody(request);
-      tables.melhorias_plataforma.unshift({ ...row, id: Date.now(), created_at: new Date().toISOString(), status: 'novo' });
-      console.log(`Relato registrado (só em memória): ${row.tipo} — ${row.area}`);
+      tables[tabelaDev].unshift({ ...row, id: Date.now(), created_at: new Date().toISOString(),
+        ...(tabelaDev === 'melhorias_plataforma' ? { status: 'novo' } : {}) });
+      if (tabelaDev === 'melhorias_plataforma') console.log(`Relato registrado (só em memória): ${row.tipo} — ${row.area}`);
       json(response, 201, [], cors);
       return;
     }
-    // Como a RLS real: só o desenvolvedor logado lê os relatos.
+    // Como a RLS real: só o desenvolvedor logado lê relatos e acessos.
     if (!isAdmin) { json(response, 200, [], cors); return; }
   }
   if (path.startsWith('/functions/v1/')) {

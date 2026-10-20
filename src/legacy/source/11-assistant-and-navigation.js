@@ -18,8 +18,10 @@
   }
 
   async _adminBotao(){
+    const dev=!!(await this._adminSessao());
     const b=document.getElementById('ai-rel-btn');
-    if(b) b.style.display=(await this._adminSessao())?'block':'none';
+    if(b) b.style.display=dev?'block':'none';
+    if(dev!==!!this.state.devMode) this.setState({devMode:dev,page:!dev&&this.state.page==='dev'?'dashboard':this.state.page},()=>this._render());
   }
 
   async _adminSair(){
@@ -135,6 +137,121 @@
     }
     const msgs=document.getElementById('ai-msgs');
     if(msgs) msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  /* Métricas de uso: cada abertura do app e cada troca de tela vira uma linha em acessos_plataforma.
+     Sem nome, senha ou IP. Falha (ex.: tabela ainda não criada) é silenciosa. */
+  _registrarAcesso(evento,pagina){
+    if(!this._db)return;
+    const ua=navigator.userAgent||'';
+    const nav=/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/Chrome\//.test(ua)?'Chrome':/Firefox\//.test(ua)?'Firefox':/Safari\//.test(ua)?'Safari':'Outro';
+    if(!this._sessaoId) this._sessaoId=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    const row={evento,pagina:pagina||null,tipo:this.state.devMode?'dev':'equipe',dispositivo:window.innerWidth<=860?'celular':'computador',navegador:nav,sessao:this._sessaoId};
+    try{ this._db.from('acessos_plataforma').insert(row).then(()=>{},()=>{}); }catch(_){}
+  }
+
+  _devTitulo(p){ return {dashboard:'Dashboard',os:'Ordens de Serviço',clientes:'Clientes',receitas:'Receitas',despesas:'Despesas',financeiro:'Financeiro','financeiro-detalhes':'Financeiro',funcionarios:'Funcionários',configuracoes:'Configurações',dev:'Dashboard DEV'}[p]||p; }
+
+  async _devCarregar(force=false){
+    if(this._devLoading) return;
+    if(!force && this._devData && Date.now()-this._devData.em<60000) return;
+    this._devLoading=true;
+    const db=this._adminDb();
+    const ler=async(t)=>{ try{ const {data,error}=await db.from(t).select('*').order('created_at',{ascending:false}).limit(5000); return error?null:(data||[]); }catch(_){ return null; } };
+    const [acessos,relatos]=await Promise.all([ler('acessos_plataforma'),ler('melhorias_plataforma')]);
+    this._devData={em:Date.now(),acessos,relatos};
+    this._devLoading=false;
+    if(this.state.page==='dev') this._render();
+  }
+
+  _renderDev(el){
+    if(!this.state.devMode){ this.setState({page:'dashboard'},()=>this._render()); return; }
+    if(!this._devData){ el.innerHTML='<div style="color:#9CA3AF;font-size:13px;padding:24px;">Carregando métricas da plataforma...</div>'; this._devCarregar(); return; }
+    this._devCarregar();
+    const {acessos,relatos}=this._devData;
+    const {ordens,clientes,faturamentos}=this.state;
+    const esc=(t)=>this._esc(t);
+    const box='background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);';
+    const h=(t,sub='')=>`<div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#111;">${t}</div>${sub?`<div style="font-size:10px;color:#9CA3AF;margin-bottom:12px;">${sub}</div>`:'<div style="height:12px;"></div>'}`;
+    const kpi=(icon,label,val,sub,color)=>`<div class="gm-kpi" style="${box}padding:16px;display:flex;align-items:center;gap:12px;"><div style="width:42px;height:42px;background:${color}1a;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${icon}</div><div><div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">${label}</div><div style="font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;color:#111;line-height:1;">${val}</div><div style="font-size:10px;color:${color};margin-top:3px;">${sub}</div></div></div>`;
+    const barras=(itens,cor)=>{ const max=Math.max(...itens.map(i=>i.v),1); return itens.map(i=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="width:130px;font-size:11px;color:#374151;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(i.k)}</span><div style="flex:1;background:#F3F4F6;border-radius:4px;height:14px;overflow:hidden;"><div style="width:${Math.round(i.v/max*100)}%;height:100%;background:${cor};"></div></div><span style="width:44px;text-align:right;font-size:11px;font-weight:700;color:#374151;flex-shrink:0;">${i.v}</span></div>`).join('')||'<div style="color:#9CA3AF;font-size:12px;padding:8px 0;">Sem dados ainda</div>'; };
+    const contar=(arr,fn)=>{ const m={}; arr.forEach(x=>{ const k=fn(x); if(k) m[k]=(m[k]||0)+1; }); return Object.entries(m).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v); };
+    const dia=(d)=>{ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
+    const hoje=dia(new Date());
+    const desde=(dias)=>Date.now()-dias*864e5;
+
+    let blocoAcessos;
+    if(acessos===null){
+      blocoAcessos=`<div style="${box}padding:18px;margin-bottom:16px;border-left:3px solid #F59E0B;font-size:12px;color:#374151;">⚠ As métricas de acesso ainda não estão disponíveis. Rode o script <b>supabase/melhorias_plataforma.sql</b> no Supabase para começar a registrar os acessos.</div>`;
+    } else {
+      const ab=acessos.filter(a=>a.evento==='abertura');
+      const tl=acessos.filter(a=>a.evento==='tela');
+      const sess=(arr)=>new Set(arr.map(a=>a.sessao)).size;
+      const hojeAb=ab.filter(a=>dia(a.created_at)===hoje);
+      const d7=ab.filter(a=>new Date(a.created_at)>=desde(7));
+      const d30=ab.filter(a=>new Date(a.created_at)>=desde(30));
+      const dias14=[...Array(14)].map((_,i)=>{ const d=new Date(Date.now()-(13-i)*864e5); return {key:dia(d),label:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'),cur:i===13}; });
+      const porDia=dias14.map(d=>({...d,v:ab.filter(a=>dia(a.created_at)===d.key).length}));
+      const maxD=Math.max(...porDia.map(d=>d.v),1);
+      const colunas=porDia.map(d=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;"><span style="font-size:9px;color:#6B7280;font-weight:700;">${d.v||''}</span><div style="width:100%;flex:1;display:flex;align-items:flex-end;background:#F9FAFB;border-radius:4px;overflow:hidden;"><div style="width:100%;height:${Math.max(Math.round(d.v/maxD*100),d.v?6:2)}%;background:${d.cur?'#FFC107':'#E5E7EB'};border-radius:4px 4px 0 0;"></div></div><span style="font-size:8px;color:${d.cur?'#FFC107':'#9CA3AF'};">${d.label}</span></div>`).join('');
+      const horas=[...Array(24)].map((_,i)=>({k:String(i).padStart(2,'0')+'h',v:ab.filter(a=>new Date(a.created_at).getHours()===i).length})).filter(x=>x.v).sort((a,b)=>b.v-a.v).slice(0,6);
+      const ultimo=acessos.find(a=>a.tipo==='equipe');
+      blocoAcessos=`
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px;">
+          ${kpi('👥','Acessos hoje',hojeAb.length,sess(hojeAb)+' sessão(ões)','#3B82F6')}
+          ${kpi('📅','Acessos 7 dias',d7.length,'média '+(d7.length/7).toFixed(1)+'/dia','#10B981')}
+          ${kpi('🗓️','Acessos 30 dias',d30.length,tl.filter(a=>new Date(a.created_at)>=desde(30)).length+' telas abertas','#8B5CF6')}
+          ${kpi('🕒','Último acesso da equipe',ultimo?new Date(ultimo.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—',ultimo?new Date(ultimo.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' · '+esc(ultimo.dispositivo||''):'sem registro','#F59E0B')}
+        </div>
+        <div style="${box}padding:20px;margin-bottom:16px;">
+          ${h('Acessos por dia','Últimos 14 dias · cada abertura do sistema')}
+          <div style="display:flex;align-items:flex-end;gap:6px;height:120px;">${colunas}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="${box}padding:18px;">${h('Tipos de acesso','Equipe × desenvolvedor')}${barras(contar(ab,a=>a.tipo==='dev'?'Desenvolvedor':'Equipe'),'#3B82F6')}
+            <div style="height:10px;"></div>${h('Aparelho')}${barras(contar(ab,a=>a.dispositivo==='celular'?'Celular':'Computador'),'#10B981')}
+            <div style="height:10px;"></div>${h('Navegador')}${barras(contar(ab,a=>a.navegador),'#8B5CF6')}</div>
+          <div style="${box}padding:18px;">${h('Telas mais usadas','Quantas vezes cada tela foi aberta')}${barras(contar(tl.filter(a=>a.tipo!=='dev'),a=>this._devTitulo(a.pagina)).slice(0,8),'#FFC107')}
+            <div style="height:10px;"></div>${h('Horários de pico','Horas com mais acessos')}${barras(horas,'#F97316')}</div>
+        </div>`;
+    }
+
+    const rel=relatos||[];
+    const cont={problema:0,sugestao:0,duvida:0}; rel.forEach(r=>{ cont[r.tipo]=(cont[r.tipo]||0)+1; });
+    const rot={problema:'⚠️ Problema',sugestao:'💡 Sugestão',duvida:'❓ Dificuldade'};
+    const fmtD=(d)=>{ try{ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(_){ return ''; } };
+    const listaRel=rel.slice(0,20).map(r=>`<div style="border-top:1px solid #F3F4F6;padding:12px 0;">
+        <div style="display:flex;justify-content:space-between;gap:4px 8px;flex-wrap:wrap;"><span style="font-weight:700;font-size:12px;color:#111;">${rot[r.tipo]||'💡 Sugestão'} — ${esc(r.area||'')}</span><span style="font-size:10px;color:#9CA3AF;flex-shrink:0;">${fmtD(r.created_at)} · ${esc(r.pagina||'')}</span></div>
+        <div style="font-size:12px;color:#374151;margin-top:4px;"><span style="color:#6B7280;">Relato:</span> ${esc(r.relato)}</div>
+        <div style="font-size:12px;color:#374151;margin-top:3px;"><span style="color:#6B7280;">Proposta:</span> ${r.proposta?esc(r.proposta):'<em style="color:#9CA3AF;">sem proposta</em>'}</div></div>`).join('')||'<div style="color:#9CA3AF;font-size:12px;padding:8px 0;">Nenhum relato registrado ainda.</div>';
+
+    const curKey=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+    const osMes=ordens.filter(o=>this._mkey(o.data)===curKey).length;
+    const fatMes=faturamentos.filter(f=>this._mkey(f.data)===curKey).reduce((s,f)=>s+parseFloat(f.valor||0),0);
+    const falhas=this._falhas().length;
+
+    el.innerHTML=`<div style="animation:fadeIn .25s ease;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:11px;color:#6B7280;">Atualizado às ${new Date(this._devData.em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="window._garcia._devCarregar(true)" style="background:#F3F4F6;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;color:#374151;cursor:pointer;">↻ Atualizar</button>
+          <button onclick="window._garcia._toggleAI();window._garcia._relatorioMelhorias();" style="background:#1A1A1A;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;color:#FFC107;cursor:pointer;">Baixar relatório de relatos</button>
+        </div>
+      </div>
+      ${blocoAcessos}
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px;">
+        ${kpi('⚠️','Problemas relatados',cont.problema,'total registrado','#EF4444')}
+        ${kpi('💡','Sugestões',cont.sugestao,'total registrado','#10B981')}
+        ${kpi('❓','Dificuldades',cont.duvida,'total registrado','#3B82F6')}
+        ${kpi('☁️','Falhas de sincronização',falhas,'neste aparelho',falhas?'#F59E0B':'#10B981')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div style="${box}padding:18px;">${h('Relatos por área','Onde estão os problemas')}${barras(contar(rel,r=>r.area||'Geral').slice(0,8),'#EF4444')}
+          <div style="height:10px;"></div>${h('Uso do sistema','Dados já existentes')}
+          <div style="font-size:12px;color:#374151;line-height:1.9;">OS no mês: <b>${osMes}</b> · OS no total: <b>${ordens.length}</b><br>Clientes cadastrados: <b>${clientes.length}</b><br>Faturamento do mês: <b>${this._fmt(fatMes)}</b></div></div>
+        <div style="${box}padding:18px;">${h('Últimos relatos','Problemas e sugestões com a proposta de melhoria da IA')}${listaRel}</div>
+      </div>
+    </div>`;
   }
 
   async _relatorioMelhorias(){
@@ -301,7 +418,7 @@
     const recomPend=recomendacoesIA.filter(r=>!r.lida).length;
     const nFalhas=this._falhas().length;
     const na=(p)=>({s:`display:flex;align-items:center;gap:10px;padding:9px 12px;${page===p?'background:rgba(255,193,7,.08);border-radius:8px;border-left:3px solid #FFC107;':'border-radius:8px;'}cursor:pointer;`,t:`font-size:${page===p?'13':'12'}px;font-weight:${page===p?'700':'500'};color:${page===p?'#FFC107':'#777'};`});
-    const pages={dashboard:{title:'Dashboard',sub:'Visão geral da oficina',btn:'+ Nova OS',action:()=>this._modalOS()},os:{title:'Ordens de Serviço',sub:ordens.filter(o=>o.status!=='Concluída').length+' em atendimento',btn:'+ Nova OS',action:()=>this._modalOS()},clientes:{title:'Clientes',sub:clientes.length+' cadastrados',btn:'+ Novo Cliente',action:()=>this._modalCli()},receitas:{title:'Receitas',sub:'Faturamentos registrados',btn:'+ Nova Receita',action:()=>this._modalRec()},despesas:{title:'Despesas',sub:'Lançamentos do período',btn:'+ Nova Despesa',action:()=>this._modalDep()},financeiro:{title:'Financeiro',sub:'Análise financeira completa',btn:'+ Nova Despesa',action:()=>this._modalDep()},'financeiro-detalhes':{title:'Financeiro',sub:'Detalhes e rankings completos',btn:'',action:()=>{}},funcionarios:{title:'Funcionários',sub:this.state.funcionarios.length+' cadastrados',btn:'+ Novo Funcionário',action:()=>this._modalFunc()},configuracoes:{title:'Configurações',sub:'Ajustes e cadastros da plataforma',btn:'',action:()=>{}}};
+    const pages={dashboard:{title:'Dashboard',sub:'Visão geral da oficina',btn:'+ Nova OS',action:()=>this._modalOS()},os:{title:'Ordens de Serviço',sub:ordens.filter(o=>o.status!=='Concluída').length+' em atendimento',btn:'+ Nova OS',action:()=>this._modalOS()},clientes:{title:'Clientes',sub:clientes.length+' cadastrados',btn:'+ Novo Cliente',action:()=>this._modalCli()},receitas:{title:'Receitas',sub:'Faturamentos registrados',btn:'+ Nova Receita',action:()=>this._modalRec()},despesas:{title:'Despesas',sub:'Lançamentos do período',btn:'+ Nova Despesa',action:()=>this._modalDep()},financeiro:{title:'Financeiro',sub:'Análise financeira completa',btn:'+ Nova Despesa',action:()=>this._modalDep()},'financeiro-detalhes':{title:'Financeiro',sub:'Detalhes e rankings completos',btn:'',action:()=>{}},funcionarios:{title:'Funcionários',sub:this.state.funcionarios.length+' cadastrados',btn:'+ Novo Funcionário',action:()=>this._modalFunc()},configuracoes:{title:'Configurações',sub:'Ajustes e cadastros da plataforma',btn:'',action:()=>{}},dev:{title:'Dashboard DEV',sub:'Métricas da plataforma · visível só para o desenvolvedor',btn:'',action:()=>{}}};
     const pg=pages[page]||pages.dashboard;
     const osAb=ordens.filter(o=>o.status!=='Concluída').length;
     const ni=(svg,active)=>React.createElement('span',{dangerouslySetInnerHTML:{__html:svg},style:{display:'flex',alignItems:'center',justifyContent:'center',width:'16px',height:'16px',flexShrink:0,opacity:active?.9:.5}});
@@ -325,6 +442,7 @@
       {...na('financeiro'),label:'Financeiro',badge:false,badgeVal:'',iconEl:ni(icons.financeiro,page==='financeiro'),go:()=>goTo('financeiro')},
       {...na('funcionarios'),label:'Funcionários',badge:false,badgeVal:'',iconEl:ni(icons.funcionarios,page==='funcionarios'),go:()=>goTo('funcionarios')},
       {...na('configuracoes'),label:'Configurações',badge:false,badgeVal:'',iconEl:ni(icons.configuracoes,page==='configuracoes'),go:()=>goTo('configuracoes')},
+      ...(this.state.devMode?[{...na('dev'),label:'Dashboard DEV',badge:false,badgeVal:'',iconEl:ni(`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${page==='dev'?'#FFC107':'#9CA3AF'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,page==='dev'),go:()=>goTo('dev')}]:[]),
     ];
     window._garcia = this;
     setTimeout(()=>this._render(),0);

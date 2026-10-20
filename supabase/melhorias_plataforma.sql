@@ -1,4 +1,4 @@
--- Tabela dos relatos do assistente de melhorias (botão flutuante).
+-- Tabelas do assistente de melhorias (botão flutuante) e das métricas do Dashboard DEV.
 -- Rodar UMA vez no Supabase: Dashboard > SQL Editor > colar e executar.
 -- Qualquer usuário do app pode só INSERIR relatos. Só o administrador (usuário do Supabase Auth
 -- marcado com role "admin", passo 2 abaixo) pode LER. Ninguém pelo app pode alterar nem apagar.
@@ -31,6 +31,35 @@ create policy "melhorias_select_admin" on public.melhorias_plataforma
 grant insert on public.melhorias_plataforma to anon, authenticated;
 grant select on public.melhorias_plataforma to authenticated;
 
+-- Acessos (métricas do Dashboard DEV): cada abertura do app e cada troca de tela.
+-- Não guarda nome, senha nem IP. App só insere; só o admin lê.
+create table if not exists public.acessos_plataforma (
+  id          bigint generated always as identity primary key,
+  created_at  timestamptz not null default now(),
+  evento      text not null check (evento in ('abertura', 'tela')),
+  tipo        text not null default 'equipe' check (tipo in ('equipe', 'dev')),
+  pagina      text,
+  dispositivo text,
+  navegador   text,
+  sessao      text
+);
+create index if not exists acessos_plataforma_created_at_idx on public.acessos_plataforma (created_at desc);
+
+alter table public.acessos_plataforma enable row level security;
+
+drop policy if exists "acessos_insert" on public.acessos_plataforma;
+create policy "acessos_insert" on public.acessos_plataforma
+  for insert to anon, authenticated
+  with check (true);
+
+drop policy if exists "acessos_select_admin" on public.acessos_plataforma;
+create policy "acessos_select_admin" on public.acessos_plataforma
+  for select to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+grant insert on public.acessos_plataforma to anon, authenticated;
+grant select on public.acessos_plataforma to authenticated;
+
 -- PASSO 2 (uma vez): em Authentication > Users > "Add user", crie o usuário com o e-mail
 -- dev@garcia-mecanica.app (não precisa existir de verdade; é o _ADMIN_EMAIL do app) e a senha de
 -- desenvolvedor (mínimo 6 caracteres), marcando "Auto Confirm User". Depois rode esta linha:
@@ -38,5 +67,6 @@ grant select on public.melhorias_plataforma to authenticated;
 --   where email = 'dev@garcia-mecanica.app';
 -- (o papel "admin" fica em app_metadata, que o próprio usuário não consegue alterar.)
 
--- ROLLBACK (apaga a tabela e todos os relatos; o usuário admin pode ser removido em Authentication > Users):
+-- ROLLBACK (apaga as tabelas, relatos e acessos; o usuário admin pode ser removido em Authentication > Users):
 -- drop table if exists public.melhorias_plataforma;
+-- drop table if exists public.acessos_plataforma;

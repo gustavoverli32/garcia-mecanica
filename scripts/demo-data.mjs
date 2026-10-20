@@ -60,6 +60,27 @@ export const melhorias_plataforma = [
     resumo: 'Buscar cliente pela placa.', proposta: 'Adicionar a placa como critério na busca de clientes.' },
 ];
 
+// Acessos fictícios dos últimos 14 dias para o Dashboard DEV.
+const telas = ['dashboard', 'os', 'os', 'os', 'clientes', 'receitas', 'despesas', 'financeiro'];
+export const acessos_plataforma = [];
+for (let dia = 13; dia >= 0; dia -= 1) {
+  const aberturas = 2 + ((dia * 7) % 5);
+  for (let i = 0; i < aberturas; i += 1) {
+    const quando = new Date(Date.now() - dia * 864e5);
+    quando.setHours(8 + ((i * 3 + dia) % 10), (i * 17) % 60, 0, 0);
+    if (quando > new Date()) continue;
+    const sessao = `demo-${dia}-${i}`;
+    const dispositivo = (i + dia) % 3 === 0 ? 'celular' : 'computador';
+    const base = { tipo: 'equipe', dispositivo, navegador: dispositivo === 'celular' ? 'Safari' : 'Chrome', sessao };
+    acessos_plataforma.push({ ...base, id: acessos_plataforma.length + 1, evento: 'abertura', pagina: 'dashboard', created_at: quando.toISOString() });
+    for (let t = 0; t < 3; t += 1) {
+      acessos_plataforma.push({ ...base, id: acessos_plataforma.length + 1, evento: 'tela', pagina: telas[(i + t + dia) % telas.length],
+        created_at: new Date(quando.getTime() + (t + 1) * 60000).toISOString() });
+    }
+  }
+}
+acessos_plataforma.reverse();
+
 const nomeCliente = (id) => ({ nome: clientes.find((c) => c.id === id)?.nome ?? '' });
 
 // Simula os joins `clientes!inner(nome)` usados pelo app.
@@ -73,4 +94,5 @@ export const tables = {
   agendamentos,
   recomendacoes_ia,
   melhorias_plataforma,
+  acessos_plataforma,
 };

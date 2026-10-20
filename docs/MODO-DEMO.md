@@ -65,5 +65,5 @@ com os dados reais.
 
 - Usuário comum (senha do sistema): abre o botão flutuante e descreve um problema ou sugestão. No modo demonstração a
   "IA" é simulada por palavras-chave e o relato fica só na memória do servidor (some ao reiniciar `npm run demo`).
-- Desenvolvedor: clique no ícone discreto no canto inferior direito do cartão de login e use a senha **DEV**. O app entra já com o relatório aberto. A senha DEV vale **só no modo demonstração**;
+- Desenvolvedor: clique no ícone discreto no canto inferior direito do cartão de login e use a senha **DEV**. O app entra direto no **Dashboard DEV** (acessos, telas mais usadas, relatos), com acessos fictícios dos últimos 14 dias. A senha DEV vale **só no modo demonstração**;
   em produção o acesso é o usuário admin criado no Supabase Auth (ver `supabase/melhorias_plataforma.sql`).
