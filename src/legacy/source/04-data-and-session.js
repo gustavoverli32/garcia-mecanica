@@ -171,13 +171,13 @@ class Component extends DCLogic {
     const senha=document.getElementById('adm-login-senha')?.value||'';
     const err=document.getElementById('adm-login-err');
     const btn=document.getElementById('adm-login-btn');
-    const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO ADMIN'; btn.disabled=false; } };
-    if(!email||!senha) return erro('Informe e-mail e senha do administrador.');
+    const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO DESENVOLVEDOR'; btn.disabled=false; } };
+    if(!email||!senha) return erro('Informe e-mail e senha.');
     if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
     try {
       await this._waitForSupabase();
       const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
-      if(error) return erro('E-mail ou senha de administrador inválidos.');
+      if(error) return erro('E-mail ou senha inválidos.');
     } catch(e) { console.error(e); return erro('Não foi possível conectar. Tente novamente.'); }
     localStorage.setItem('g_sess','1');
     this.setState({ loggedIn:true, loginErr:'' }, () => {
