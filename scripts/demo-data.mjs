@@ -51,6 +51,15 @@ export const agendamentos = [
 
 export const recomendacoes_ia = [];
 
+export const melhorias_plataforma = [
+  { id: 2, created_at: '2026-10-19T10:00:00Z', tipo: 'problema', area: 'Ordens de Serviço', pagina: 'Ordens de Serviço', status: 'novo',
+    relato: 'Não consegui cadastrar a OS do cliente (exemplo), deu erro ao salvar com dois serviços.',
+    resumo: 'Erro ao salvar OS com dois serviços.', proposta: 'Validar cada serviço antes de salvar e mostrar qual campo está com problema.' },
+  { id: 1, created_at: '2026-10-18T14:20:00Z', tipo: 'sugestao', area: 'Clientes', pagina: 'Clientes', status: 'novo',
+    relato: 'Seria bom poder buscar cliente pela placa do carro.',
+    resumo: 'Buscar cliente pela placa.', proposta: 'Adicionar a placa como critério na busca de clientes.' },
+];
+
 const nomeCliente = (id) => ({ nome: clientes.find((c) => c.id === id)?.nome ?? '' });
 
 // Simula os joins `clientes!inner(nome)` usados pelo app.
@@ -63,4 +72,5 @@ export const tables = {
   servicos,
   agendamentos,
   recomendacoes_ia,
+  melhorias_plataforma,
 };

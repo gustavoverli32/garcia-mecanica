@@ -51,7 +51,47 @@ function query(table, params, wantsObject) {
   return wantsObject ? rows[0] ?? null : rows;
 }
 
-function handleApi(request, response, url) {
+// Assistente de melhorias: login de desenvolvedor (senha DEV), relatos guardados só em memória
+// e uma "IA" simulada que classifica o relato por palavras-chave.
+export const DEMO_DEV_PASSWORD = 'DEV';
+const DEMO_ADMIN_TOKEN = 'demo-admin-token';
+const readBody = (request) => new Promise((done) => {
+  let raw = '';
+  request.on('data', (chunk) => { raw += chunk; });
+  request.on('end', () => { try { done(JSON.parse(raw || '{}')); } catch { done({}); } });
+});
+
+function iaSimulada(pergunta) {
+  const relato = (pergunta.match(/Relato do usuário: """([\s\S]*)"""/)?.[1] ?? pergunta).trim();
+  const texto = relato.toLowerCase();
+  const tipo = /erro|problema|não consegui|nao consegui|travou|bug|não salva|não funciona/.test(texto) ? 'problema'
+    : /seria bom|sugest|poderia|gostaria|melhor se/.test(texto) ? 'sugestao' : 'duvida';
+  const area = /\bos\b|ordem de serviço|ordem de servico/.test(texto) ? 'Ordens de Serviço'
+    : /cliente/.test(texto) ? 'Clientes' : /despesa/.test(texto) ? 'Despesas'
+    : /receita|pagamento|financeiro/.test(texto) ? 'Financeiro' : (pergunta.match(/tela "([^"]*)"/)?.[1] || 'Geral');
+  return JSON.stringify({
+    tipo,
+    area,
+    resumo: relato.slice(0, 140),
+    proposta: `(Proposta simulada no modo demonstração) Revisar o fluxo de ${area} para resolver: "${relato.slice(0, 80)}".`,
+  });
+}
+
+async function handleAuth(request, response, path, cors) {
+  const body = await readBody(request);
+  if (!path.startsWith('/auth/v1/token') || body.password !== DEMO_DEV_PASSWORD) {
+    json(response, 400, { error: 'invalid_grant', error_description: 'Invalid login credentials' }, cors);
+    return;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  json(response, 200, {
+    access_token: DEMO_ADMIN_TOKEN, token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, refresh_token: 'demo',
+    user: { id: 'demo-dev', aud: 'authenticated', role: 'authenticated', email: body.email || 'dev@demo',
+      app_metadata: { role: 'admin' }, user_metadata: {}, created_at: new Date().toISOString() },
+  }, cors);
+}
+
+async function handleApi(request, response, url) {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': '*',
@@ -59,6 +99,28 @@ function handleApi(request, response, url) {
   };
   if (request.method === 'OPTIONS') { response.writeHead(204, cors).end(); return; }
   const path = url.pathname.replace('/demo-supabase', '');
+  if (path.startsWith('/auth/v1/')) {
+    if (path.startsWith('/auth/v1/logout')) { response.writeHead(204, cors).end(); return; }
+    await handleAuth(request, response, path, cors);
+    return;
+  }
+  if (path.startsWith('/functions/v1/assistente-ia')) {
+    const { pergunta = '' } = await readBody(request);
+    json(response, 200, { resposta: iaSimulada(pergunta) }, cors);
+    return;
+  }
+  const isAdmin = String(request.headers.authorization ?? '').includes(DEMO_ADMIN_TOKEN);
+  if (path === '/rest/v1/melhorias_plataforma') {
+    if (request.method === 'POST') {
+      const row = await readBody(request);
+      tables.melhorias_plataforma.unshift({ ...row, id: Date.now(), created_at: new Date().toISOString(), status: 'novo' });
+      console.log(`Relato registrado (só em memória): ${row.tipo} — ${row.area}`);
+      json(response, 201, [], cors);
+      return;
+    }
+    // Como a RLS real: só o desenvolvedor logado lê os relatos.
+    if (!isAdmin) { json(response, 200, [], cors); return; }
+  }
   if (path.startsWith('/functions/v1/')) {
     json(response, 200, {
       resposta: 'Modo demonstração: o assistente de IA não é chamado aqui.',
@@ -91,7 +153,7 @@ const statics = new Map([
 export function createDemoServer(html) {
   return createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://localhost');
-    if (url.pathname.startsWith('/demo-supabase/')) { handleApi(request, response, url); return; }
+    if (url.pathname.startsWith('/demo-supabase/')) { await handleApi(request, response, url); return; }
     if (request.method !== 'GET' && request.method !== 'HEAD') { response.writeHead(405).end(); return; }
     if (url.pathname === '/' || url.pathname === '/index.html') {
       response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -115,6 +177,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const html = await buildDemoHtml();
   createDemoServer(html).listen(port, '127.0.0.1', () => {
     console.log(`\nModo demonstração da Garcia: http://localhost:${port}/`);
-    console.log('Senha de acesso: a mesma do sistema. Dados fictícios; nenhuma gravação chega ao Supabase.\n');
+    console.log('Senha de acesso: a mesma do sistema. Desenvolvedor (ícone no canto do login): senha DEV (e-mail opcional).');
+    console.log('Dados fictícios; nenhuma gravação chega ao Supabase. Relatos do assistente ficam só na memória.\n');
   });
 }

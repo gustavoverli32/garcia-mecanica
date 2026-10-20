@@ -172,7 +172,7 @@ class Component extends DCLogic {
     const err=document.getElementById('adm-login-err');
     const btn=document.getElementById('adm-login-btn');
     const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO DESENVOLVEDOR'; btn.disabled=false; } };
-    if(!email||!senha) return erro('Informe e-mail e senha.');
+    if(!senha) return erro('Informe a senha.');
     if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
     try {
       await this._waitForSupabase();

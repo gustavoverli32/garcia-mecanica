@@ -704,7 +704,7 @@ class Component extends DCLogic {
     const err=document.getElementById('adm-login-err');
     const btn=document.getElementById('adm-login-btn');
     const erro=(m)=>{ if(err){ err.textContent=m; err.style.display='block'; } if(btn){ btn.textContent='ENTRAR COMO DESENVOLVEDOR'; btn.disabled=false; } };
-    if(!email||!senha) return erro('Informe e-mail e senha.');
+    if(!senha) return erro('Informe a senha.');
     if(btn){ btn.textContent='ENTRANDO...'; btn.disabled=true; }
     try {
       await this._waitForSupabase();
@@ -3418,7 +3418,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
       const senha=f.querySelector('#adm-senha')?.value||'';
       const err=f.querySelector('#adm-err');
       const btn=f.querySelector('#adm-entrar');
-      if(!email||!senha){ err.textContent='Informe e-mail e senha.'; err.style.display='block'; return; }
+      if(!senha){ err.textContent='Informe a senha.'; err.style.display='block'; return; }
       btn.textContent='Entrando...'; btn.disabled=true;
       const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
       if(error){ err.textContent='E-mail ou senha inválidos.'; err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false; return; }

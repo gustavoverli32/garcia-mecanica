@@ -40,7 +40,7 @@
       const senha=f.querySelector('#adm-senha')?.value||'';
       const err=f.querySelector('#adm-err');
       const btn=f.querySelector('#adm-entrar');
-      if(!email||!senha){ err.textContent='Informe e-mail e senha.'; err.style.display='block'; return; }
+      if(!senha){ err.textContent='Informe a senha.'; err.style.display='block'; return; }
       btn.textContent='Entrando...'; btn.disabled=true;
       const {error}=await this._adminDb().auth.signInWithPassword({email,password:senha});
       if(error){ err.textContent='E-mail ou senha inválidos.'; err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false; return; }
