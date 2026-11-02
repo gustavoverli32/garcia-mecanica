@@ -6,8 +6,7 @@ as $$
   select jsonb_build_object(
     'project', 'Garcia Mecânica',
     'total', count(*),
-    'open', count(*) filter (where lower(coalesce(status, '')) not in ('resolvido', 'concluido', 'concluído', 'fechado')),
-    'latestAt', max(created_at)
+    'open', count(*) filter (where lower(coalesce(status, '')) not in ('resolvido', 'concluido', 'concluído', 'fechado'))
   )
   from public.melhorias_plataforma;
 $$;
