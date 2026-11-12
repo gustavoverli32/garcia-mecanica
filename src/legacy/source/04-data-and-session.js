@@ -416,6 +416,7 @@ class Component extends DCLogic {
       if(a)this._mobObs.observe(a,{childList:true,subtree:true});
       if(b)this._mobObs.observe(b,{childList:true,subtree:true});
       this._mobLabels();
+      this._toggleSidebar(false);
     };
     setTimeout(go,300);
   }
@@ -424,9 +425,35 @@ class Component extends DCLogic {
     const bg=document.getElementById('modal-bg');
     const box=document.getElementById('modal-box');
     if(!bg||!box)return;
+    if(bg.style.display!=='flex')this._modalReturnFocus=document.activeElement;
     box.innerHTML=html;
     bg.style.display='flex';
     bg.onclick=(e)=>{ if(e.target===bg) this._closeModal(); };
+    box.onclick=()=>queueMicrotask(()=>{if(bg.style.display==='none')this._closeModal();});
+    if(!this._modalEscapeHandler){
+      this._modalEscapeHandler=(e)=>{
+        const open=document.getElementById('modal-bg')?.style.display==='flex';
+        if(e.key==='Tab'&&open){
+          const controls=[...box.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]')].filter(el=>el.getClientRects().length);
+          if(controls.length){
+            const first=controls[0],last=controls[controls.length-1];
+            if(e.shiftKey&&(document.activeElement===first||document.activeElement===box)){e.preventDefault();last.focus();}
+            else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===box)){e.preventDefault();first.focus();}
+          }
+          return;
+        }
+        if(e.key!=='Escape')return;
+        if(open)this._closeModal();
+        else if(document.getElementById('gm-sidebar')?.classList.contains('gm-open'))this._toggleSidebar(false);
+      };
+      document.addEventListener('keydown',this._modalEscapeHandler);
+    }
+    box.focus({preventScroll:true});
   }
-  _closeModal(){ const bg=document.getElementById('modal-bg'); if(bg) bg.style.display='none'; }
+  _closeModal(){
+    const bg=document.getElementById('modal-bg');
+    if(bg)bg.style.display='none';
+    if(this._modalReturnFocus?.isConnected)this._modalReturnFocus.focus({preventScroll:true});
+    this._modalReturnFocus=null;
+  }
 

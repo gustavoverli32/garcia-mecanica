@@ -264,6 +264,13 @@ input,select,textarea,button{font-family:'Montserrat',sans-serif}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 #gm-hamburger{display:none}
+.gm-nav-item:hover{background:rgba(255,193,7,.06)!important}
+.gm-nav-item[aria-current="page"]:hover{background:rgba(255,193,7,.12)!important}
+button:focus-visible,[role="button"]:focus-visible{outline:3px solid #FFC107;outline-offset:2px}
+button{touch-action:manipulation}
+#modal-bg{padding:12px}
+#modal-box{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+#main-content{scrollbar-gutter:stable}
 @media (max-width:1100px){
   #main-content [style*="display:grid"]>*{min-width:0!important;}
   #main-content [style*="grid-template-columns:repeat(4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
@@ -284,7 +291,7 @@ input,select,textarea,button{font-family:'Montserrat',sans-serif}
   [style*="grid-template-columns:repeat(3"]{grid-template-columns:repeat(2,1fr)!important;}
   [style*="grid-template-columns:repeat(4"]{grid-template-columns:repeat(2,1fr)!important;}
   [style*="grid-template-columns:1fr 264px"]{grid-template-columns:1fr!important;}
-  #modal-box{width:92%!important;max-width:none!important;padding:20px 16px!important;max-height:88vh!important;overflow-y:auto!important;}
+  #modal-box{width:100%!important;max-width:none!important;padding:20px 16px!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;}
   #ai-panel{width:100vw!important;height:100dvh!important;top:0!important;left:0!important;right:0!important;bottom:0!important;border-radius:0!important;}
   #ai-btn{bottom:20px!important;right:20px!important;}
   #ai-input{font-size:16px!important;}
@@ -322,7 +329,8 @@ input,select,textarea,button{font-family:'Montserrat',sans-serif}
   #main-content tbody td:not([data-l])::before,#modal-box tbody td:not([data-l])::before{display:none;}
   #main-content tbody td>div,#modal-box tbody td>div{justify-content:flex-end!important;flex-wrap:wrap;}
   #main-content tbody td[data-l]:empty::after{content:'—';color:#D1D5DB;}
-  #main-content tbody td button{min-height:34px!important;}
+  #main-content tbody td button{min-height:44px!important;}
+  #main-content select,#main-content input[type="search"],#main-content button,.gm-page-action{min-height:44px}
   #main-content{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;}
 }
 @media (min-width:861px){
@@ -337,6 +345,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
 .gm-os-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
 .gm-os-section-head h2{font-family:'Rajdhani',sans-serif;font-size:19px;color:#111;line-height:1.2}
 .gm-os-section-head p{font-size:11px;color:#9CA3AF;line-height:1.5;margin-top:3px}
+.gm-os-view-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.gm-os-view-toggle{border:1px solid #E5E7EB;border-radius:8px;background:#fff;color:#374151;padding:8px 11px;min-height:36px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap}
+.gm-os-view-toggle:hover{border-color:#FFC107;background:#FFFBEB}
+.gm-os-compacta .gm-os-flow{grid-template-columns:repeat(4,minmax(0,1fr));min-width:0;gap:8px}
+.gm-os-compacta .gm-os-stage{padding:7px}
+.gm-os-compacta .gm-os-stage-list{gap:6px;min-height:70px}
+.gm-os-compacta .gm-os-stage-empty{min-height:70px}
+.gm-os-compacta .gm-os-card{min-height:118px;gap:5px;padding:9px}
+.gm-os-compacta .gm-os-card-service{min-height:0;-webkit-line-clamp:1}
 .gm-os-total{background:#FFFBEB;color:#92400E;padding:6px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
 .gm-os-flow-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:7px}
 .gm-os-flow{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:11px;min-width:925px;align-items:start}
@@ -395,8 +412,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
 .gm-os-action-danger{background:#FEF2F2;color:#DC2626}
 .gm-os-action:disabled{opacity:.45;cursor:not-allowed}.gm-os-stage-actions{margin-bottom:9px}.gm-os-note h2{font-family:'Rajdhani',sans-serif;font-size:21px;color:#111;margin:0 0 8px}.gm-os-note p{font-size:12px;color:#6B7280;line-height:1.5;margin:0 0 14px}.gm-os-note-paid{background:#ECFDF5;color:#047857;font-size:16px;font-weight:700;border-radius:9px;padding:14px;margin-bottom:14px}.gm-os-note .gm-os-detail-actions{margin-bottom:12px}.gm-os-note .gm-os-note-help{font-size:10px;color:#92400E}
 @media (max-width:1200px){.gm-os-flow{min-width:0;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){.gm-os-compacta .gm-os-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:860px){.gm-os-flow-panel,.gm-os-history-panel{padding:14px}.gm-os-section-head{flex-wrap:wrap}.gm-os-detail-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:500px){.gm-os-flow{grid-template-columns:1fr}.gm-os-detail-grid{grid-template-columns:1fr}.gm-os-history-list{grid-template-columns:1fr}}
+@media (max-width:500px){.gm-os-compacta .gm-os-flow{grid-template-columns:1fr}.gm-os-view-actions{justify-content:flex-start}}
 </style>
 </helmet>
 
@@ -451,7 +470,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
     </div>
     <nav style="flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:1px;">
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
-        <div style="{{ n.s }}" sc-camel-on-click="{{ n.go }}">{{ n.iconEl }}<span style="{{ n.t }}">{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;background:#FF8C00;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;">{{ n.badgeVal }}</span></sc-if></div>
+        <button type="button" class="gm-nav-item" style="{{ n.s }}" aria-current="{{ n.current }}" sc-camel-on-click="{{ n.go }}">{{ n.iconEl }}<span style="{{ n.t }}">{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;background:#FF8C00;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;">{{ n.badgeVal }}</span></sc-if></button>
       </sc-for>
     </nav>
     <div style="padding:12px 14px;border-top:1px solid #262626;">
@@ -468,12 +487,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;">
     <div style="background:#fff;border-bottom:1px solid #E5E7EB;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-        <div id="gm-hamburger" sc-camel-on-click="{{ openSidebar }}" style="align-items:center;justify-content:center;width:36px;height:36px;background:#F3F4F6;border-radius:8px;cursor:pointer;flex-shrink:0;">
+        <button type="button" id="gm-hamburger" aria-label="Abrir menu" aria-controls="gm-sidebar" aria-expanded="false" sc-camel-on-click="{{ openSidebar }}" style="align-items:center;justify-content:center;width:44px;height:44px;border:0;background:#F3F4F6;border-radius:8px;cursor:pointer;flex-shrink:0;">
           <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </div>
+        </button>
         <div style="min-width:0;overflow:hidden;"><div style="font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;color:#111;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ pageTitle }}</div><div style="font-size:10px;color:#9CA3AF;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ pageSub }}</div></div>
       </div>
-      <div sc-camel-on-click="{{ pageAction }}" style="background:#FFC107;border-radius:8px;padding:9px 14px;cursor:pointer;flex-shrink:0;display:{{ pageBtnDisplay }};"><span style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#000;letter-spacing:.5px;white-space:nowrap;">{{ pageBtn }}</span></div>
+      <button type="button" class="gm-page-action" sc-camel-on-click="{{ pageAction }}" style="background:#FFC107;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;flex-shrink:0;display:{{ pageBtnDisplay }};"><span style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#000;letter-spacing:.5px;white-space:nowrap;">{{ pageBtn }}</span></button>
     </div>
     <div id="main-content" style="flex:1;overflow-y:auto;padding:20px 24px;">
       <div style="font-size:13px;color:#9CA3AF;text-align:center;padding:40px;">Carregando...</div>
@@ -483,13 +502,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
 
 <!-- MODALS -->
 <div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;">
-  <div id="modal-box" style="background:#fff;border-radius:16px;padding:28px;width:90%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:fadeIn .2s ease;"></div>
+  <div id="modal-box" role="dialog" aria-modal="true" tabindex="-1" style="background:#fff;border-radius:16px;padding:28px;width:90%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:fadeIn .2s ease;"></div>
 </div>
 
 <!-- AI CHAT BUTTON -->
-<div id="ai-btn" sc-camel-on-click="{{ toggleAI }}" style="position:fixed;bottom:28px;right:28px;z-index:9000;width:52px;height:52px;background:linear-gradient(135deg,#FFC107,#FF8C00);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(255,193,7,.4);transition:transform .2s;" title="Assistente IA Garcia">
+<button type="button" id="ai-btn" aria-label="Abrir assistente de melhorias" sc-camel-on-click="{{ toggleAI }}" style="position:fixed;bottom:28px;right:28px;z-index:9000;width:52px;height:52px;border:0;background:linear-gradient(135deg,#FFC107,#FF8C00);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(255,193,7,.4);transition:transform .2s;" title="Assistente IA Garcia">
   <svg width="24" height="24" sc-camel-view-box="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="12" cy="10" r="1" fill="#000"></circle><circle cx="8" cy="10" r="1" fill="#000"></circle><circle cx="16" cy="10" r="1" fill="#000"></circle></svg>
-</div>
+</button>
 
 <!-- AI CHAT PANEL -->
 <div id="ai-panel" style="display:none;position:fixed;bottom:92px;right:28px;z-index:9001;width:360px;height:480px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;animation:fadeIn .2s ease;">
@@ -530,6 +549,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#FFC107!import
 </sc-if>
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
+
 class Component extends DCLogic {
   _PWD = '123456';
   /* Usuário do Supabase Auth do desenvolvedor: a tela pede só a senha. */
@@ -947,6 +967,7 @@ class Component extends DCLogic {
       if(a)this._mobObs.observe(a,{childList:true,subtree:true});
       if(b)this._mobObs.observe(b,{childList:true,subtree:true});
       this._mobLabels();
+      this._toggleSidebar(false);
     };
     setTimeout(go,300);
   }
@@ -955,11 +976,37 @@ class Component extends DCLogic {
     const bg=document.getElementById('modal-bg');
     const box=document.getElementById('modal-box');
     if(!bg||!box)return;
+    if(bg.style.display!=='flex')this._modalReturnFocus=document.activeElement;
     box.innerHTML=html;
     bg.style.display='flex';
     bg.onclick=(e)=>{ if(e.target===bg) this._closeModal(); };
+    box.onclick=()=>queueMicrotask(()=>{if(bg.style.display==='none')this._closeModal();});
+    if(!this._modalEscapeHandler){
+      this._modalEscapeHandler=(e)=>{
+        const open=document.getElementById('modal-bg')?.style.display==='flex';
+        if(e.key==='Tab'&&open){
+          const controls=[...box.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]')].filter(el=>el.getClientRects().length);
+          if(controls.length){
+            const first=controls[0],last=controls[controls.length-1];
+            if(e.shiftKey&&(document.activeElement===first||document.activeElement===box)){e.preventDefault();last.focus();}
+            else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===box)){e.preventDefault();first.focus();}
+          }
+          return;
+        }
+        if(e.key!=='Escape')return;
+        if(open)this._closeModal();
+        else if(document.getElementById('gm-sidebar')?.classList.contains('gm-open'))this._toggleSidebar(false);
+      };
+      document.addEventListener('keydown',this._modalEscapeHandler);
+    }
+    box.focus({preventScroll:true});
   }
-  _closeModal(){ const bg=document.getElementById('modal-bg'); if(bg) bg.style.display='none'; }
+  _closeModal(){
+    const bg=document.getElementById('modal-bg');
+    if(bg)bg.style.display='none';
+    if(this._modalReturnFocus?.isConnected)this._modalReturnFocus.focus({preventScroll:true});
+    this._modalReturnFocus=null;
+  }
 
   _modalOS(){
     const box=document.getElementById('modal-box');
@@ -3238,9 +3285,10 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     }).join('');
     const meses=`<option value="all" ${mes==='all'?'selected':''}>Todos os meses</option>`+this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===mes?'selected':''}>${m.label}</option>`).join('');
     const periodos=[['todos','Todos'],['hoje','Hoje'],['semana','Últimos 7 dias'],['q15','Últimos 15 dias']].map(([key,label])=>`<button type="button" class="gm-os-period${periodo===key?' active':''}" aria-pressed="${periodo===key}" onclick="window._garcia.setOSPeriodFilter('${key}')">${label}</button>`).join('');
+    const compacta=this._osCompacta===undefined?(typeof localStorage!=='undefined'&&localStorage.getItem('gm_os_compacta')==='1'):this._osCompacta;
     el.innerHTML=`<div class="gm-os-page" style="animation:fadeIn .25s ease;">
-      <section class="gm-os-flow-panel" aria-label="Fluxo de atendimento">
-        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div>
+      <section class="gm-os-flow-panel${compacta?' gm-os-compacta':''}" aria-label="Fluxo de atendimento">
+        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><div class="gm-os-view-actions"><button type="button" class="gm-os-view-toggle" aria-pressed="${compacta}" onclick="window._garcia._alternarVistaOS()">${compacta?'Tamanho normal':'− Visão compacta'}</button><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div></div>
         <div class="gm-os-flow-scroll"><div class="gm-os-flow">${colunas}</div></div>
       </section>
       <section class="gm-os-history-panel" aria-label="Histórico de ordens concluídas">
@@ -3264,6 +3312,14 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     });
     const empty=document.getElementById('gm-os-history-empty');
     if(empty)empty.hidden=shown>0;
+  }
+  _alternarVistaOS(){
+    this._osCompacta=!(this._osCompacta===undefined?(typeof localStorage!=='undefined'&&localStorage.getItem('gm_os_compacta')==='1'):this._osCompacta);
+    if(typeof localStorage!=='undefined')localStorage.setItem('gm_os_compacta',this._osCompacta?'1':'0');
+    const panel=document.querySelector('.gm-os-flow-panel');
+    panel?.classList.toggle('gm-os-compacta',this._osCompacta);
+    const button=panel?.querySelector('.gm-os-view-toggle');
+    if(button){button.textContent=this._osCompacta?'Tamanho normal':'− Visão compacta';button.setAttribute('aria-pressed',String(this._osCompacta));}
   }
   _clicarCardOS(id){
     if(Date.now()<(this._osIgnorarCliqueAte||0))return;
@@ -3365,8 +3421,15 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
   setOSMonthFilter(f){ this.setState({osMonthFilter:f},()=>this._render()); }
   setRecFilter(f){ this.setState({recFilter:f},()=>this._render()); }
   setDepFilter(f){ this.setState({depFilter:f},()=>this._render()); }
-  goOS(){ this.setState({page:'os'},()=>this._render()); }
-  goTo(p){ this.setState({page:p},()=>this._render()); }
+  goOS(){ this.goTo('os'); }
+  goTo(p){
+    const changed=this.state.page!==p;
+    this.setState({page:p},()=>{
+      this._render();
+      if(changed){const main=document.getElementById('main-content');if(main)main.scrollTop=0;}
+    });
+    this._toggleSidebar(false);
+  }
 
   _toggleSidebar(open){
     const sb=document.getElementById('gm-sidebar');
@@ -3375,6 +3438,12 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     const shouldOpen = open!==undefined ? open : !sb.classList.contains('gm-open');
     sb.classList.toggle('gm-open',shouldOpen);
     ov.classList.toggle('gm-open',shouldOpen);
+    document.getElementById('gm-hamburger')?.setAttribute('aria-expanded',String(shouldOpen));
+    sb.inert=window.matchMedia('(max-width:860px)').matches&&!shouldOpen;
+    if(!this._gmSidebarResize){
+      this._gmSidebarResize=()=>{const sidebar=document.getElementById('gm-sidebar');if(sidebar){const mobile=window.matchMedia('(max-width:860px)').matches;sidebar.inert=mobile&&!sidebar.classList.contains('gm-open');}};
+      window.addEventListener('resize',this._gmSidebarResize);
+    }
   }
 
   /* ══════════ IA ══════════ */
@@ -3797,7 +3866,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
     const {loggedIn,loginErr,page,ordens,clientes,connected,osFilter,recomendacoesIA}=this.state;
     const recomPend=recomendacoesIA.filter(r=>!r.lida).length;
     const nFalhas=this._falhas().length;
-    const na=(p)=>({s:`display:flex;align-items:center;gap:10px;padding:9px 12px;${page===p?'background:rgba(255,193,7,.08);border-radius:8px;border-left:3px solid #FFC107;':'border-radius:8px;'}cursor:pointer;`,t:`font-size:${page===p?'13':'12'}px;font-weight:${page===p?'700':'500'};color:${page===p?'#FFC107':'#777'};`});
+    const na=(p)=>({s:`display:flex;align-items:center;gap:10px;min-height:44px;width:100%;text-align:left;font:inherit;border:0;padding:9px 12px;${page===p?'background:rgba(255,193,7,.08);border-radius:8px;border-left:3px solid #FFC107;':'background:transparent;border-radius:8px;'}cursor:pointer;`,t:`font-size:${page===p?'13':'12'}px;font-weight:${page===p?'700':'500'};color:${page===p?'#FFC107':'#777'};`,current:page===p?'page':'false'});
     const pages={dashboard:{title:'Dashboard',sub:'Visão geral da oficina',btn:'+ Nova OS',action:()=>this._modalOS()},os:{title:'Ordens de Serviço',sub:ordens.filter(o=>o.status!=='Concluída').length+' em atendimento',btn:'+ Nova OS',action:()=>this._modalOS()},clientes:{title:'Clientes',sub:clientes.length+' cadastrados',btn:'+ Novo Cliente',action:()=>this._modalCli()},receitas:{title:'Receitas',sub:'Faturamentos registrados',btn:'+ Nova Receita',action:()=>this._modalRec()},despesas:{title:'Despesas',sub:'Lançamentos do período',btn:'+ Nova Despesa',action:()=>this._modalDep()},financeiro:{title:'Financeiro',sub:'Análise financeira completa',btn:'+ Nova Despesa',action:()=>this._modalDep()},'financeiro-detalhes':{title:'Financeiro',sub:'Detalhes e rankings completos',btn:'',action:()=>{}},funcionarios:{title:'Funcionários',sub:this.state.funcionarios.length+' cadastrados',btn:'+ Novo Funcionário',action:()=>this._modalFunc()},configuracoes:{title:'Configurações',sub:'Ajustes e cadastros da plataforma',btn:'',action:()=>{}},dev:{title:'Dashboard DEV',sub:'Métricas da plataforma · visível só para o desenvolvedor',btn:'',action:()=>{}}};
     const pg=pages[page]||pages.dashboard;
     const osAb=ordens.filter(o=>o.status!=='Concluída').length;
@@ -3812,7 +3881,7 @@ _Garcia Auto Mecânica — Campos dos Goytacazes RJ_`;
       funcionarios:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${page==='funcionarios'?'#FFC107':'#9CA3AF'}" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
       configuracoes:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${page==='configuracoes'?'#FFC107':'#9CA3AF'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
     };
-    const goTo=(p)=>{ this.setState({page:p},()=>this._render()); this._toggleSidebar(false); };
+    const goTo=(p)=>this.goTo(p);
     const navItems=[
       {...na('dashboard'),label:'Dashboard',badge:false,badgeVal:'',iconEl:ni(icons.dashboard,page==='dashboard'),go:()=>goTo('dashboard')},
       {...na('os'),label:'Ordens de Serviço',badge:osAb>0,badgeVal:osAb,iconEl:ni(icons.os,page==='os'),go:()=>goTo('os')},

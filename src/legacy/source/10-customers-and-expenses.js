@@ -277,9 +277,10 @@
     }).join('');
     const meses=`<option value="all" ${mes==='all'?'selected':''}>Todos os meses</option>`+this._monthOptions().map(m=>`<option value="${m.key}" ${m.key===mes?'selected':''}>${m.label}</option>`).join('');
     const periodos=[['todos','Todos'],['hoje','Hoje'],['semana','Últimos 7 dias'],['q15','Últimos 15 dias']].map(([key,label])=>`<button type="button" class="gm-os-period${periodo===key?' active':''}" aria-pressed="${periodo===key}" onclick="window._garcia.setOSPeriodFilter('${key}')">${label}</button>`).join('');
+    const compacta=this._osCompacta===undefined?(typeof localStorage!=='undefined'&&localStorage.getItem('gm_os_compacta')==='1'):this._osCompacta;
     el.innerHTML=`<div class="gm-os-page" style="animation:fadeIn .25s ease;">
-      <section class="gm-os-flow-panel" aria-label="Fluxo de atendimento">
-        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div>
+      <section class="gm-os-flow-panel${compacta?' gm-os-compacta':''}" aria-label="Fluxo de atendimento">
+        <div class="gm-os-section-head"><div><h2>Fluxo de atendimento</h2><p>Clique para abrir ou arraste um card para mudar de etapa.</p></div><div class="gm-os-view-actions"><button type="button" class="gm-os-view-toggle" aria-pressed="${compacta}" onclick="window._garcia._alternarVistaOS()">${compacta?'Tamanho normal':'− Visão compacta'}</button><span class="gm-os-total">${abertas.length} ${abertas.length===1?'OS aberta':'OS abertas'}</span></div></div>
         <div class="gm-os-flow-scroll"><div class="gm-os-flow">${colunas}</div></div>
       </section>
       <section class="gm-os-history-panel" aria-label="Histórico de ordens concluídas">
@@ -303,6 +304,14 @@
     });
     const empty=document.getElementById('gm-os-history-empty');
     if(empty)empty.hidden=shown>0;
+  }
+  _alternarVistaOS(){
+    this._osCompacta=!(this._osCompacta===undefined?(typeof localStorage!=='undefined'&&localStorage.getItem('gm_os_compacta')==='1'):this._osCompacta);
+    if(typeof localStorage!=='undefined')localStorage.setItem('gm_os_compacta',this._osCompacta?'1':'0');
+    const panel=document.querySelector('.gm-os-flow-panel');
+    panel?.classList.toggle('gm-os-compacta',this._osCompacta);
+    const button=panel?.querySelector('.gm-os-view-toggle');
+    if(button){button.textContent=this._osCompacta?'Tamanho normal':'− Visão compacta';button.setAttribute('aria-pressed',String(this._osCompacta));}
   }
   _clicarCardOS(id){
     if(Date.now()<(this._osIgnorarCliqueAte||0))return;
@@ -404,8 +413,15 @@
   setOSMonthFilter(f){ this.setState({osMonthFilter:f},()=>this._render()); }
   setRecFilter(f){ this.setState({recFilter:f},()=>this._render()); }
   setDepFilter(f){ this.setState({depFilter:f},()=>this._render()); }
-  goOS(){ this.setState({page:'os'},()=>this._render()); }
-  goTo(p){ this.setState({page:p},()=>this._render()); }
+  goOS(){ this.goTo('os'); }
+  goTo(p){
+    const changed=this.state.page!==p;
+    this.setState({page:p},()=>{
+      this._render();
+      if(changed){const main=document.getElementById('main-content');if(main)main.scrollTop=0;}
+    });
+    this._toggleSidebar(false);
+  }
 
   _toggleSidebar(open){
     const sb=document.getElementById('gm-sidebar');
@@ -414,6 +430,12 @@
     const shouldOpen = open!==undefined ? open : !sb.classList.contains('gm-open');
     sb.classList.toggle('gm-open',shouldOpen);
     ov.classList.toggle('gm-open',shouldOpen);
+    document.getElementById('gm-hamburger')?.setAttribute('aria-expanded',String(shouldOpen));
+    sb.inert=window.matchMedia('(max-width:860px)').matches&&!shouldOpen;
+    if(!this._gmSidebarResize){
+      this._gmSidebarResize=()=>{const sidebar=document.getElementById('gm-sidebar');if(sidebar){const mobile=window.matchMedia('(max-width:860px)').matches;sidebar.inert=mobile&&!sidebar.classList.contains('gm-open');}};
+      window.addEventListener('resize',this._gmSidebarResize);
+    }
   }
 
   /* ══════════ IA ══════════ */
